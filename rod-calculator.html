@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>রড ক্যালকুলেটর - Salim Learning Point</title>
+<meta name="description" content="রডের ডায়া অনুযায়ী ওজন, দৈর্ঘ্য, রডের সংখ্যা ও মোট ওজন হিসাবের ক্যালকুলেটর, সূত্র এবং ২০টি ইন্টারঅ্যাকটিভ MCQ।">
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 12px;
+  font-family: Arial, "Noto Sans Bengali", sans-serif;
+  background: #f1f6fc;
+  color: #1f2d3d;
+}
+
+.wrap { max-width: 850px; margin: 10px auto; }
+
+.header {
+  padding: 30px 18px;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(135deg,#063d82,#078bd0);
+  border-radius: 20px 20px 0 0;
+}
+.header .icon { font-size: 44px; }
+.header h1 { margin: 6px 0; font-size: 28px; }
+.header p { margin: 6px 0 0; font-size: 15px; line-height: 1.7; }
+
+.card {
+  background: #fff;
+  padding: 22px 20px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(0,0,0,.08);
+}
+.header + .card { border-radius: 0 0 16px 16px; }
+
+h2 { margin: 0 0 14px; font-size: 21px; color: #0756a5; }
+h3 { margin: 18px 0 8px; font-size: 17px; color: #0756a5; }
+
+/* Tabs */
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.tab {
+  flex: 1 1 160px;
+  padding: 11px 10px;
+  border: 1px solid #cfdcec;
+  background: #f5f9fd;
+  color: #24496e;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.tab.active { background: #0756a5; color: #fff; border-color: #0756a5; }
+
+/* Form */
+.grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 14px; }
+label { display: block; font-size: 14px; font-weight: bold; color: #24496e; margin-bottom: 5px; }
+input, select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #c4d3e6;
+  border-radius: 9px;
+  font-size: 16px;
+  background: #fff;
+}
+input:focus, select:focus { outline: 2px solid #078bd0; border-color: #078bd0; }
+.row2 { display: flex; gap: 8px; }
+.row2 input { flex: 2; }
+.row2 select { flex: 1; }
+
+.btn {
+  display: inline-block;
+  padding: 13px 24px;
+  margin-top: 16px;
+  color: #fff;
+  background: linear-gradient(135deg,#0875cb,#0756a5);
+  border: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.btn:hover { background: #06447f; }
+.btn.gray { background: #64748b; margin-left: 8px; }
+
+/* Result */
+.result { display: none; margin-top: 18px; }
+.result.show { display: block; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit,minmax(170px,1fr)); gap: 10px; }
+.stat {
+  padding: 14px 10px;
+  text-align: center;
+  background: #eef6ff;
+  border: 1px solid #d3e4f7;
+  border-radius: 12px;
+}
+.stat .v { font-size: 22px; font-weight: bold; color: #063d82; }
+.stat .l { font-size: 13px; color: #596779; margin-top: 4px; }
+.stat.hl { background: #e5f8ed; border-color: #bfe8cf; }
+.stat.hl .v { color: #128348; }
+.steps {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: #fffbea;
+  border: 1px solid #f3e3a1;
+  border-radius: 12px;
+  font-size: 14.5px;
+  line-height: 1.9;
+}
+.err { margin-top: 14px; color: #b42318; font-weight: bold; }
+
+/* Tables */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 520px; }
+th, td { padding: 9px 8px; text-align: center; border-bottom: 1px solid #e2eaf3; }
+th { background: #0756a5; color: #fff; }
+tr:nth-child(even) td { background: #f5f9fd; }
+tr.pick td { background: #fff3c4 !important; font-weight: bold; }
+
+/* Formula */
+.formula {
+  margin: 10px 0;
+  padding: 14px 16px;
+  background: #f5f9fd;
+  border-left: 5px solid #078bd0;
+  border-radius: 8px;
+  line-height: 1.9;
+  font-size: 15px;
+}
+.formula b { color: #063d82; }
+.formula code { background: #fff; padding: 2px 7px; border: 1px solid #d3e4f7; border-radius: 5px; font-size: 15px; }
+
+/* Quiz */
+.q-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 14px; color: #596779; }
+.bar { height: 8px; background: #e2eaf3; border-radius: 6px; margin: 10px 0 18px; overflow: hidden; }
+.bar > div { height: 100%; width: 0; background: linear-gradient(90deg,#078bd0,#128348); transition: .3s; }
+.q-text { font-size: 18px; font-weight: bold; line-height: 1.6; margin-bottom: 14px; }
+.opt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 13px 14px;
+  margin-bottom: 10px;
+  background: #fff;
+  border: 2px solid #d3e0ef;
+  border-radius: 11px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #1f2d3d;
+}
+.opt:hover:not(:disabled) { border-color: #078bd0; background: #f2f9ff; }
+.opt.correct { background: #e5f8ed; border-color: #16a34a; }
+.opt.wrong { background: #fdecea; border-color: #dc2626; }
+.opt:disabled { cursor: default; }
+.explain {
+  display: none;
+  margin-top: 6px;
+  padding: 12px 14px;
+  background: #eef6ff;
+  border-radius: 10px;
+  line-height: 1.8;
+  font-size: 14.5px;
+}
+.explain.show { display: block; }
+.nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+.nav .btn { margin-top: 0; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.score-box { text-align: center; padding: 20px 10px; }
+.score-box .big { font-size: 46px; font-weight: bold; color: #0756a5; }
+
+.footer {
+  padding: 18px;
+  text-align: center;
+  color: #fff;
+  background: #102e50;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+@media(max-width:600px) {
+  body { padding: 4px; }
+  .header h1 { font-size: 23px; }
+  .card { padding: 18px 13px; }
+  .q-text { font-size: 16.5px; }
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="icon">🏗️</div>
+    <h1>রড ক্যালকুলেটর</h1>
+    <p>রডের ডায়া অনুযায়ী ওজন, দৈর্ঘ্য, রডের সংখ্যা ও মোট ওজন হিসাব করুন</p>
+  </div>
+
+  <!-- CALCULATOR -->
+  <div class="card">
+    <h2>🧮 ক্যালকুলেটর</h2>
+
+    <div class="tabs">
+      <button class="tab active" data-mode="A">রডের সংখ্যা → মোট ওজন</button>
+      <button class="tab" data-mode="B">মোট দৈর্ঘ্য → রডের সংখ্যা</button>
+      <button class="tab" data-mode="C">ওজন (kg) → দৈর্ঘ্য ও সংখ্যা</button>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label for="dia">রডের ডায়া (mm)</label>
+        <select id="dia">
+          <option value="6">6 mm</option>
+          <option value="8">8 mm</option>
+          <option value="10">10 mm</option>
+          <option value="12" selected>12 mm</option>
+          <option value="16">16 mm</option>
+          <option value="20">20 mm</option>
+          <option value="22">22 mm</option>
+          <option value="25">25 mm</option>
+          <option value="28">28 mm</option>
+          <option value="32">32 mm</option>
+          <option value="custom">অন্য ডায়া (নিজে লিখুন)</option>
+        </select>
+        <input id="customDia" type="number" min="1" step="any" placeholder="ডায়া লিখুন (mm)" style="display:none;margin-top:8px">
+      </div>
+
+      <div>
+        <label for="rodLen">একটি রডের দৈর্ঘ্য</label>
+        <div class="row2">
+          <input id="rodLen" type="number" min="0.1" step="any" value="12">
+          <select id="rodUnit">
+            <option value="m" selected>মিটার</option>
+            <option value="ft">ফুট</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="boxA">
+        <label for="numRods">রডের সংখ্যা (টি)</label>
+        <input id="numRods" type="number" min="1" step="1" value="10">
+      </div>
+
+      <div id="boxB" style="display:none">
+        <label for="totLen">মোট প্রয়োজনীয় দৈর্ঘ্য</label>
+        <div class="row2">
+          <input id="totLen" type="number" min="0.1" step="any" value="500">
+          <select id="totUnit">
+            <option value="m" selected>মিটার</option>
+            <option value="ft">ফুট</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="boxC" style="display:none">
+        <label for="totKg">মোট ওজন (kg)</label>
+        <input id="totKg" type="number" min="0.1" step="any" value="1000">
+      </div>
+    </div>
+
+    <button class="btn" id="calcBtn">হিসাব করুন</button>
+    <button class="btn gray" id="resetBtn">রিসেট</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="card">
+    <h2>📋 ডায়া অনুযায়ী রডের ওজন তালিকা</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ডায়া (mm)</th>
+            <th>ওজন (kg/মিটার)</th>
+            <th>ওজন (kg/ফুট)</th>
+            <th>১২ মিটার (৪০ ফুট) রডের ওজন (kg)</th>
+            <th>প্রতি টনে ১২ মি. রড (টি)</th>
+          </tr>
+        </thead>
+        <tbody id="tblBody"></tbody>
+      </table>
+    </div>
+    <p style="font-size:13px;color:#596779;margin:10px 0 0">* সূত্র দিয়ে হিসাব করা তাত্ত্বিক মান। বাস্তবে কারখানাভেদে সামান্য পার্থক্য থাকতে পারে।</p>
+  </div>
+
+  <!-- FORMULA -->
+  <div class="card">
+    <h2>📐 সূত্র</h2>
+
+    <div class="formula">
+      <b>১. প্রতি মিটারে ওজন (kg/m):</b><br>
+      <code>W = D² ÷ 162</code> &nbsp; (D = রডের ডায়া, mm)
+    </div>
+
+    <div class="formula">
+      <b>২. প্রতি ফুটে ওজন (kg/ft):</b><br>
+      <code>W = D² ÷ 533</code> &nbsp; (D = রডের ডায়া, mm)
+    </div>
+
+    <div class="formula">
+      <b>৩. একটি রডের ওজন:</b><br>
+      <code>একটি রডের ওজন = (D² ÷ 162) × রডের দৈর্ঘ্য (মিটার)</code>
+    </div>
+
+    <div class="formula">
+      <b>৪. রডের সংখ্যা:</b><br>
+      <code>সংখ্যা = মোট দৈর্ঘ্য ÷ একটি রডের দৈর্ঘ্য</code> (ভগ্নাংশ হলে পরের পূর্ণ সংখ্যা)
+    </div>
+
+    <div class="formula">
+      <b>৫. মোট ওজন:</b><br>
+      <code>মোট ওজন = রডের সংখ্যা × একটি রডের ওজন</code>
+    </div>
+
+    <div class="formula">
+      <b>৬. ওজন থেকে দৈর্ঘ্য:</b><br>
+      <code>দৈর্ঘ্য (m) = মোট ওজন (kg) ÷ (D² ÷ 162)</code>
+    </div>
+
+    <h3>সূত্র কীভাবে এল?</h3>
+    <div class="formula">
+      রডের প্রস্থচ্ছেদের ক্ষেত্রফল = π D² ÷ 4 এবং স্টিলের ঘনত্ব ≈ ৭৮৫০ kg/m³।<br>
+      D মিমি হলে, ওজন/মিটার = (π ÷ 4) × (D ÷ 1000)² × ৭৮৫০ ≈ D² × 0.00617 = <b>D² ÷ 162</b>।<br>
+      ১ মিটার = ৩.২৮১ ফুট, তাই ফুটপ্রতি ওজন = D² ÷ (162 × 3.281) ≈ <b>D² ÷ 533</b>।
+    </div>
+
+    <h3>উদাহরণ</h3>
+    <div class="formula">
+      ১২ মিমি ডায়া, ১২ মিটার দৈর্ঘ্যের ৫০টি রডের মোট ওজন কত?<br>
+      ওজন/মিটার = 12² ÷ 162 = 144 ÷ 162 = 0.889 kg<br>
+      একটি রডের ওজন = 0.889 × 12 = 10.67 kg<br>
+      মোট ওজন = 50 × 10.67 = <b>533.3 kg</b>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="card" id="quizCard">
+    <h2>📝 ইন্টারঅ্যাকটিভ MCQ (২০টি)</h2>
+    <div id="quizArea"></div>
+  </div>
+
+  <div class="footer">
+    © Salim Learning Point<br>
+    Learn • Practice • Build Your Skills
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var FT = 0.3048;
+  var mode = 'A';
+  var $ = function (id) { return document.getElementById(id); };
+
+  function fmt(n, d) {
+    if (d === undefined) d = 2;
+    return Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  }
+
+  function getDia() {
+    var v = $('dia').value;
+    return v === 'custom' ? parseFloat($('customDia').value) : parseFloat(v);
+  }
+
+  /* ---------- Tabs ---------- */
+  var tabs = document.querySelectorAll('.tab');
+  Array.prototype.forEach.call(tabs, function (t) {
+    t.addEventListener('click', function () {
+      Array.prototype.forEach.call(tabs, function (x) { x.classList.remove('active'); });
+      t.classList.add('active');
+      mode = t.getAttribute('data-mode');
+      $('boxA').style.display = mode === 'A' ? '' : 'none';
+      $('boxB').style.display = mode === 'B' ? '' : 'none';
+      $('boxC').style.display = mode === 'C' ? '' : 'none';
+      $('result').className = 'result';
+    });
+  });
+
+  $('dia').addEventListener('change', function () {
+    $('customDia').style.display = this.value === 'custom' ? 'block' : 'none';
+  });
+
+  /* ---------- Calculator ---------- */
+  function stat(v, l, hl) {
+    return '<div class="stat' + (hl ? ' hl' : '') + '"><div class="v">' + v + '</div><div class="l">' + l + '</div></div>';
+  }
+
+  function calc() {
+    var res = $('result');
+    var D = getDia();
+    var L = parseFloat($('rodLen').value);
+    if (!(D > 0) || !(L > 0)) {
+      res.innerHTML = '<div class="err">দয়া করে সঠিক ডায়া ও রডের দৈর্ঘ্য দিন।</div>';
+      res.className = 'result show';
+      return;
+    }
+    var Lm = $('rodUnit').value === 'ft' ? L * FT : L;
+    var wpm = D * D / 162;
+    var wpf = D * D / 533;
+    var wRod = wpm * Lm;
+    var html = '', steps = '', n, totLenM, totW;
+
+    steps += '১) প্রতি মিটারে ওজন = ' + D + '² ÷ 162 = ' + fmt(D * D, 2) + ' ÷ 162 = <b>' + fmt(wpm, 3) + ' kg/m</b><br>';
+    steps += '২) একটি রডের ওজন = ' + fmt(wpm, 3) + ' × ' + fmt(Lm, 2) + ' = <b>' + fmt(wRod, 2) + ' kg</b><br>';
+
+    if (mode === 'A') {
+      n = parseFloat($('numRods').value);
+      if (!(n > 0)) { res.innerHTML = '<div class="err">রডের সংখ্যা সঠিকভাবে দিন।</div>'; res.className = 'result show'; return; }
+      totLenM = n * Lm;
+      totW = n * wRod;
+      steps += '৩) মোট দৈর্ঘ্য = ' + fmt(n, 0) + ' × ' + fmt(Lm, 2) + ' = <b>' + fmt(totLenM, 2) + ' মিটার</b><br>';
+      steps += '৪) মোট ওজন = ' + fmt(n, 0) + ' × ' + fmt(wRod, 2) + ' = <b>' + fmt(totW, 2) + ' kg</b>';
+      html = '<div class="stats">' +
+        stat(fmt(wpm, 3) + ' kg', 'ওজন প্রতি মিটার') +
+        stat(fmt(wpf, 3) + ' kg', 'ওজন প্রতি ফুট') +
+        stat(fmt(wRod, 2) + ' kg', 'একটি রডের ওজন') +
+        stat(fmt(n, 0) + ' টি', 'রডের সংখ্যা') +
+        stat(fmt(totLenM, 2) + ' m', 'মোট দৈর্ঘ্য (' + fmt(totLenM / FT, 1) + ' ফুট)') +
+        stat(fmt(totW, 2) + ' kg', 'মোট ওজন (' + fmt(totW / 1000, 3) + ' টন)', true) +
+        '</div>';
+    } else if (mode === 'B') {
+      var T = parseFloat($('totLen').value);
+      if (!(T > 0)) { res.innerHTML = '<div class="err">মোট দৈর্ঘ্য সঠিকভাবে দিন।</div>'; res.className = 'result show'; return; }
+      var Tm = $('totUnit').value === 'ft' ? T * FT : T;
+      var exact = Tm / Lm;
+      n = Math.ceil(exact - 1e-9);
+      var needW = Tm * wpm;
+      totW = n * wRod;
+      steps += '৩) রডের সংখ্যা = ' + fmt(Tm, 2) + ' ÷ ' + fmt(Lm, 2) + ' = ' + fmt(exact, 2) + ' ≈ <b>' + n + ' টি</b> (পূর্ণ সংখ্যায়)<br>';
+      steps += '৪) প্রয়োজনীয় দৈর্ঘ্যের ওজন = ' + fmt(Tm, 2) + ' × ' + fmt(wpm, 3) + ' = <b>' + fmt(needW, 2) + ' kg</b><br>';
+      steps += '৫) কেনা ' + n + 'টি রডের মোট ওজন = ' + n + ' × ' + fmt(wRod, 2) + ' = <b>' + fmt(totW, 2) + ' kg</b>';
+      html = '<div class="stats">' +
+        stat(fmt(wpm, 3) + ' kg', 'ওজন প্রতি মিটার') +
+        stat(fmt(wRod, 2) + ' kg', 'একটি রডের ওজন') +
+        stat(fmt(Tm, 2) + ' m', 'প্রয়োজনীয় দৈর্ঘ্য') +
+        stat(n + ' টি', 'রডের সংখ্যা', true) +
+        stat(fmt(needW, 2) + ' kg', 'প্রয়োজনীয় দৈর্ঘ্যের ওজন') +
+        stat(fmt(totW, 2) + ' kg', 'কেনা রডের মোট ওজন', true) +
+        '</div>';
+    } else {
+      var W = parseFloat($('totKg').value);
+      if (!(W > 0)) { res.innerHTML = '<div class="err">মোট ওজন সঠিকভাবে দিন।</div>'; res.className = 'result show'; return; }
+      var lenM = W / wpm;
+      var ex = lenM / Lm;
+      steps += '৩) মোট দৈর্ঘ্য = ' + fmt(W, 2) + ' ÷ ' + fmt(wpm, 3) + ' = <b>' + fmt(lenM, 2) + ' মিটার</b><br>';
+      steps += '৪) রডের সংখ্যা = ' + fmt(lenM, 2) + ' ÷ ' + fmt(Lm, 2) + ' = <b>' + fmt(ex, 2) + ' টি</b>';
+      html = '<div class="stats">' +
+        stat(fmt(wpm, 3) + ' kg', 'ওজন প্রতি মিটার') +
+        stat(fmt(wRod, 2) + ' kg', 'একটি রডের ওজন') +
+        stat(fmt(W, 2) + ' kg', 'মোট ওজন (' + fmt(W / 1000, 3) + ' টন)') +
+        stat(fmt(lenM, 2) + ' m', 'মোট দৈর্ঘ্য (' + fmt(lenM / FT, 1) + ' ফুট)', true) +
+        stat(fmt(ex, 2) + ' টি', 'রডের সংখ্যা (প্রায় ' + Math.round(ex) + ' টি)', true) +
+        '</div>';
+    }
+
+    html += '<div class="steps"><b>ধাপে ধাপে হিসাব:</b><br>' + steps + '</div>';
+    res.innerHTML = html;
+    res.className = 'result show';
+    highlightRow(D);
+  }
+
+  $('calcBtn').addEventListener('click', calc);
+  $('resetBtn').addEventListener('click', function () {
+    $('dia').value = '12';
+    $('customDia').style.display = 'none';
+    $('customDia').value = '';
+    $('rodLen').value = 12;
+    $('rodUnit').value = 'm';
+    $('numRods').value = 10;
+    $('totLen').value = 500;
+    $('totUnit').value = 'm';
+    $('totKg').value = 1000;
+    $('result').className = 'result';
+    highlightRow(null);
+  });
+
+  /* ---------- Table ---------- */
+  var DIAS = [6, 8, 10, 12, 16, 20, 22, 25, 28, 32];
+  var tb = '';
+  DIAS.forEach(function (d) {
+    var wpm = d * d / 162;
+    var w12 = wpm * 12;
+    tb += '<tr data-d="' + d + '"><td>' + d + '</td><td>' + fmt(wpm, 3) + '</td><td>' + fmt(d * d / 533, 3) +
+          '</td><td>' + fmt(w12, 2) + '</td><td>' + fmt(1000 / w12, 1) + '</td></tr>';
+  });
+  $('tblBody').innerHTML = tb;
+
+  function highlightRow(d) {
+    Array.prototype.forEach.call(document.querySelectorAll('#tblBody tr'), function (r) {
+      r.className = (d !== null && Number(r.getAttribute('data-d')) === d) ? 'pick' : '';
+    });
+  }
+
+  /* ---------- Quiz ---------- */
+  var Q = [
+    { q: 'রডের প্রতি মিটারে ওজন (kg/m) বের করার প্রচলিত সূত্র কোনটি? (D = ডায়া, mm)',
+      o: ['D² ÷ 533', 'D² ÷ 162', 'D ÷ 162', 'D³ ÷ 162'], a: 1,
+      e: 'প্রতি মিটারে ওজন = D² ÷ 162 (kg/m)। আর প্রতি ফুটের জন্য D² ÷ 533।' },
+    { q: '১০ মিমি ডায়ার রডের প্রতি মিটারে ওজন কত?',
+      o: ['০.৬১৭ kg', '০.৮৮৯ kg', '১.৫৮০ kg', '০.৩৯৫ kg'], a: 0,
+      e: '10² ÷ 162 = 100 ÷ 162 = 0.617 kg/m।' },
+    { q: '১২ মিমি ডায়ার রডের প্রতি মিটারে ওজন কত?',
+      o: ['০.৬১৭ kg', '১.২৩৪ kg', '০.৮৮৯ kg', '১.৫৮০ kg'], a: 2,
+      e: '12² ÷ 162 = 144 ÷ 162 = 0.889 kg/m।' },
+    { q: '১৬ মিমি ডায়ার রডের প্রতি মিটারে ওজন কত?',
+      o: ['১.৫৮০ kg', '২.৪৬৯ kg', '০.৮৮৯ kg', '১.২৫০ kg'], a: 0,
+      e: '16² ÷ 162 = 256 ÷ 162 = 1.580 kg/m।' },
+    { q: '২০ মিমি ডায়ার রডের প্রতি মিটারে ওজন কত?',
+      o: ['১.৫৮০ kg', '৩.৮৫৮ kg', '২.৪৬৯ kg', '২.০০০ kg'], a: 2,
+      e: '20² ÷ 162 = 400 ÷ 162 = 2.469 kg/m।' },
+    { q: '২৫ মিমি ডায়ার রডের প্রতি মিটারে ওজন কত?',
+      o: ['২.৪৬৯ kg', '৩.৮৫৮ kg', '৪.৯৩৮ kg', '৩.১২৫ kg'], a: 1,
+      e: '25² ÷ 162 = 625 ÷ 162 = 3.858 kg/m।' },
+    { q: '৮ মিমি ডায়ার রডের প্রতি মিটারে ওজন কত?',
+      o: ['০.৩৯৫ kg', '০.৬১৭ kg', '০.২৫০ kg', '০.৮০০ kg'], a: 0,
+      e: '8² ÷ 162 = 64 ÷ 162 = 0.395 kg/m।' },
+    { q: 'রডের প্রতি ফুটে ওজন (kg/ft) বের করার সূত্র কোনটি?',
+      o: ['D² ÷ 162', 'D² ÷ 533', 'D² ÷ 1000', 'D² ÷ 3.281'], a: 1,
+      e: '১ মিটার = ৩.২৮১ ফুট, তাই 162 × 3.281 ≈ 533। সূত্র: D² ÷ 533।' },
+    { q: 'একটি ১২ মিমি ডায়া, ১২ মিটার দৈর্ঘ্যের রডের ওজন প্রায় কত?',
+      o: ['৭.৪০ kg', '১০.৬৭ kg', '১৮.৯৬ kg', '২৯.৬৩ kg'], a: 1,
+      e: '0.889 × 12 = 10.67 kg।' },
+    { q: 'একটি ১৬ মিমি ডায়া, ১২ মিটার দৈর্ঘ্যের রডের ওজন প্রায় কত?',
+      o: ['১০.৬৭ kg', '১৮.৯৬ kg', '২৯.৬৩ kg', '১৫.০০ kg'], a: 1,
+      e: '1.580 × 12 = 18.96 kg।' },
+    { q: 'একটি ২০ মিমি ডায়া, ১২ মিটার দৈর্ঘ্যের রডের ওজন প্রায় কত?',
+      o: ['১৮.৯৬ kg', '২৯.৬৩ kg', '৪৬.২৯ kg', '২৪.৬৯ kg'], a: 1,
+      e: '2.469 × 12 = 29.63 kg।' },
+    { q: 'বাংলাদেশের বাজারে রডের প্রচলিত আদর্শ দৈর্ঘ্য কত?',
+      o: ['২০ ফুট', '৩০ ফুট', '৪০ ফুট (প্রায় ১২ মিটার)', '৬০ ফুট'], a: 2,
+      e: 'সাধারণত রড ৪০ ফুট (প্রায় ১২ মিটার) লম্বা হয়।' },
+    { q: '১০ মিমি ডায়ার ১ টন রডের মোট দৈর্ঘ্য প্রায় কত?',
+      o: ['১০০০ মিটার', '১৬২১ মিটার', '২৪৬৯ মিটার', '৮৮৯ মিটার'], a: 1,
+      e: 'দৈর্ঘ্য = 1000 ÷ 0.617 ≈ 1621 মিটার।' },
+    { q: '১২ মিমি ডায়ার ১২ মিটার দৈর্ঘ্যের রড দিয়ে ১ টন (১০০০ kg) পেতে প্রায় কতটি রড লাগবে?',
+      o: ['৫০টি', '৭৫টি', '৯৪টি', '১২০টি'], a: 2,
+      e: 'একটি রডের ওজন 10.67 kg, তাই 1000 ÷ 10.67 ≈ 93.75 ≈ 94টি।' },
+    { q: '১০ মিমি ডায়ার ১২ মিটার দৈর্ঘ্যের ৫০টি রডের মোট ওজন প্রায় কত?',
+      o: ['২৫০.০ kg', '৩০০.০ kg', '৩৭০.৪ kg', '৪২৫.০ kg'], a: 2,
+      e: 'একটি রড = 0.617 × 12 = 7.407 kg। মোট = 7.407 × 50 ≈ 370.4 kg।' },
+    { q: '৬০০ মিটার রডের প্রয়োজন হলে ১২ মিটারের কতটি রড লাগবে?',
+      o: ['৪০টি', '৫০টি', '৬০টি', '৭২টি'], a: 1,
+      e: '600 ÷ 12 = 50টি।' },
+    { q: '২৫০ মিটার রডের প্রয়োজন হলে ১২ মিটারের কতটি রড কিনতে হবে?',
+      o: ['২০টি', '২১টি', '২২টি', '২৫টি'], a: 1,
+      e: '250 ÷ 12 = 20.83। ভগ্নাংশ হলে পরের পূর্ণ সংখ্যা নিতে হয়, তাই ২১টি।' },
+    { q: 'D² ÷ 162 সূত্রটি মূলত কোন ঘনত্বের মানের ওপর ভিত্তি করে তৈরি?',
+      o: ['স্টিলের ঘনত্ব ≈ ৭৮৫০ kg/m³', 'পানির ঘনত্ব ১০০০ kg/m³', 'কংক্রিটের ঘনত্ব ২৪০০ kg/m³', 'অ্যালুমিনিয়ামের ঘনত্ব ২৭০০ kg/m³'], a: 0,
+      e: 'ক্ষেত্রফল π D²/4 এবং স্টিলের ঘনত্ব ≈ 7850 kg/m³ ধরে সূত্র দাঁড়ায় ≈ D² ÷ 162।' },
+    { q: 'রডের ডায়া দ্বিগুণ করলে একই দৈর্ঘ্যের রডের ওজন কত গুণ হবে?',
+      o: ['২ গুণ', '৩ গুণ', '৪ গুণ', '৮ গুণ'], a: 2,
+      e: 'ওজন D²-এর সমানুপাতিক। ডায়া ২ গুণ হলে ওজন 2² = ৪ গুণ।' },
+    { q: 'নিচের কোন ডায়ার রডের প্রতি মিটারে ওজন সবচেয়ে বেশি?',
+      o: ['৮ মিমি', '১০ মিমি', '১২ মিমি', '১৬ মিমি'], a: 3,
+      e: 'ওজন D²-এর সমানুপাতিক, তাই বড় ডায়ার রডের ওজন বেশি। এখানে ১৬ মিমি-এর মান সবচেয়ে বেশি (১.৫৮০ kg/m)।' }
+  ];
+
+  var idx = 0, score = 0, answered = [], area = $('quizArea');
+
+  function render() {
+    if (idx >= Q.length) { return showScore(); }
+    var item = Q[idx];
+    var done = answered[idx] !== undefined;
+    var h = '<div class="q-top"><span>প্রশ্ন ' + (idx + 1) + ' / ' + Q.length + '</span><span>স্কোর: <b>' + score + '</b></span></div>';
+    h += '<div class="bar"><div style="width:' + (idx / Q.length * 100) + '%"></div></div>';
+    h += '<div class="q-text">' + (idx + 1) + '. ' + item.q + '</div>';
+    var letters = ['ক', 'খ', 'গ', 'ঘ'];
+    item.o.forEach(function (op, i) {
+      var cls = 'opt';
+      if (done) {
+        if (i === item.a) cls += ' correct';
+        else if (i === answered[idx]) cls += ' wrong';
+      }
+      h += '<button class="' + cls + '" data-i="' + i + '"' + (done ? ' disabled' : '') + '>' + letters[i] + ') ' + op + '</button>';
+    });
+    h += '<div class="explain' + (done ? ' show' : '') + '" id="exp">' +
+         (done ? (answered[idx] === item.a ? '✅ সঠিক উত্তর!<br>' : '❌ ভুল উত্তর। সঠিক উত্তর: ' + letters[item.a] + ') ' + item.o[item.a] + '<br>') + '<b>ব্যাখ্যা:</b> ' + item.e : '') +
+         '</div>';
+    h += '<div class="nav">' +
+         '<button class="btn" id="prevQ"' + (idx === 0 ? ' disabled' : '') + '>← আগের</button>' +
+         '<button class="btn" id="nextQ"' + (done ? '' : ' disabled') + '>' + (idx === Q.length - 1 ? 'ফলাফল দেখুন' : 'পরের →') + '</button>' +
+         '</div>';
+    area.innerHTML = h;
+
+    Array.prototype.forEach.call(area.querySelectorAll('.opt'), function (b) {
+      b.addEventListener('click', function () { choose(parseInt(b.getAttribute('data-i'), 10)); });
+    });
+    $('prevQ').addEventListener('click', function () { if (idx > 0) { idx--; render(); } });
+    $('nextQ').addEventListener('click', function () { idx++; render(); });
+  }
+
+  function choose(i) {
+    if (answered[idx] !== undefined) return;
+    answered[idx] = i;
+    if (i === Q[idx].a) score++;
+    render();
+  }
+
+  function showScore() {
+    var pct = Math.round(score / Q.length * 100);
+    var msg = pct >= 80 ? '🎉 চমৎকার! আপনার ধারণা খুব ভালো।' :
+              pct >= 50 ? '👍 ভালো, আরেকটু অনুশীলন করলে আরও ভালো হবে।' :
+                          '📚 সূত্র ও তালিকা আবার দেখে নতুন করে চেষ্টা করুন।';
+    var wrong = Q.length - score;
+    area.innerHTML =
+      '<div class="bar"><div style="width:100%"></div></div>' +
+      '<div class="score-box"><div class="big">' + score + ' / ' + Q.length + '</div>' +
+      '<p style="font-size:18px;margin:8px 0">' + pct + '% সঠিক &nbsp;|&nbsp; ভুল: ' + wrong + '</p>' +
+      '<p>' + msg + '</p>' +
+      '<div class="nav" style="justify-content:center">' +
+      '<button class="btn" id="reviewQ">উত্তর পর্যালোচনা</button>' +
+      '<button class="btn gray" id="restartQ">আবার শুরু করুন</button></div></div>';
+    $('reviewQ').addEventListener('click', function () { idx = 0; render(); });
+    $('restartQ').addEventListener('click', function () { idx = 0; score = 0; answered = []; render(); });
+  }
+
+  render();
+})();
+</script>
+
+</body>
+</html>
