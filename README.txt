@@ -1,32 +1,16 @@
-SALIM LEARNING POINT - GITHUB PAGES FILES
-
-Upload all files in this folder to the ROOT of your existing GitHub repository:
-trainingdrive8-debug/Salim-Learning-point
-
+SALIM LEARNING POINT - ADVANCED COURSE CONTENT
 Files:
-index.html       Main home page
-login.html       Login page
-books.html       Books section
-mcq.html         MCQ section
-training.html    Training section
-practical.html  Practical section
-admission.html  Online admission form page
-about.html       About page
-contact.html     Contact page
-style.css        Shared design
-script.js        Shared navigation/login logic
+- rod-binding.html
+- masonry.html
+- tiles-marble.html
 
-DEMO LOGIN:
-Username: admin
-Password: Salim@#1992
+Each page includes all course units, Bengali practical guides, tools/materials, step-by-step procedures, safety instructions, and 20 interactive MCQs per unit.
 
-IMPORTANT SECURITY:
-This is a demonstration-only front-end gate. The password is present in
-JavaScript and can be discovered by visitors. Do not use it to protect private
-student records, paid content, or confidential data. For real authentication,
-use a server-side authentication service.
+Total:
+- Rod Binding: 9 units / 180 MCQs
+- Masonry: 10 units / 200 MCQs
+- Tiles & Marble: 11 units / 220 MCQs
+- Overall: 30 units / 600 MCQs
 
-After uploading, open:
-https://trainingdrive8-debug.github.io/Salim-Learning-point/
-
-The login session lasts for the current browser tab session. Logout clears it.
+Upload these three HTML files to the ROOT of your existing GitHub repository and replace the files with the same names. Keep style.css and script.js unchanged. Commit changes, then open training.html and click a course.
+Note: The MCQs are self-assessment practice questions, not official certification exam questions. Follow approved drawings, project specifications, manufacturer instructions and site safety rules for actual work.
