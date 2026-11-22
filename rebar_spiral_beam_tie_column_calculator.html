@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="bn"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>রডের হিসাব ক্যালকুলেটর — Spiral, Beam, Tie Column</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:#172334;font-family:Arial,"Noto Sans Bengali",sans-serif;line-height:1.55}.wrap{max-width:1050px;margin:22px auto;padding:14px}.panel{background:#fff;padding:20px;border-radius:14px;margin-bottom:16px;box-shadow:0 4px 18px #10233b12}h1,h2,h3{color:#15549a;margin:0 0 12px}h1{font-size:25px}h2{font-size:20px}.note{background:#fff7e6;border-left:4px solid #e3a126;padding:12px;border-radius:7px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px}label{font-weight:bold;font-size:14px;display:block;margin-bottom:5px}input,select{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px}button{border:0;border-radius:8px;padding:12px 18px;background:#15549a;color:#fff;font-size:16px;font-weight:bold;margin:12px 8px 0 0;cursor:pointer}.secondary{background:#475569}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab{background:#e6edf7;color:#174575}.tab.active{background:#15549a;color:white}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.metric{background:#eef5ff;padding:13px;border-radius:9px}.metric small{display:block;color:#52657d}.metric strong{font-size:21px;color:#12477f}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #d8e0ea;padding:9px;text-align:left}th{background:#edf3fb}.muted{font-size:13px;color:#596779}.hide{display:none}.formula{background:#f6f8fb;border-radius:8px;padding:10px;overflow-wrap:anywhere} @media print{body{background:white}.wrap{margin:0}.panel{box-shadow:none;border:1px solid #ddd}button,.tabs{display:none}}
+</style></head><body><div class="wrap">
+<section class="panel">
+<h1>🏗️ রডের হিসাব ক্যালকুলেটর</h1>
+<p>রডের ডায়া ও কাজের মাপ ইনপুট দিলে স্পাইরাল, বিম এবং টাই কলামের রডের দৈর্ঘ্য, ওজন ও আনুমানিক মোট রড বের হবে।</p>
+<div class="note"><b>গুরুত্বপূর্ণ:</b> এটি পরিমাণ নির্ণয়ের সহায়ক ক্যালকুলেটর—স্ট্রাকচারাল ডিজাইন নয়। রডের সংখ্যা, ডায়া, স্পেসিং, কভার, হুক/অ্যাঙ্করেজ ও ল্যাপ অবশ্যই অনুমোদিত structural drawing/engineer-এর নির্দেশ অনুযায়ী দিন।</div>
+<div class="tabs"><button class="tab active" id="btnSp" onclick="show('sp')">স্পাইরাল রড</button><button class="tab" id="btnBm" onclick="show('bm')">বিমের রড</button><button class="tab" id="btnTc" onclick="show('tc')">টাই কলাম</button></div>
+<div id="sp" class="section">
+<h2>১. স্পাইরাল রড (Helical Reinforcement)</h2>
+<div class="grid">
+<div><label>কলামের উচ্চতা (ফুট)</label><input id="spH" type="number" value="10" min=".1" step=".1"></div>
+<div><label>কলাম / কোরের ব্যাস (ইঞ্চি)</label><input id="spD" type="number" value="18" min=".1" step=".1"></div>
+<div><label>কভার (ইঞ্চি)</label><input id="spC" type="number" value="1.5" min="0" step=".125"></div>
+<div><label>স্পাইরাল রডের ডায়া (মিমি)</label><select id="spDia"><option>8</option><option selected>10</option><option>12</option><option>16</option></select></div>
+<div><label>স্পাইরাল পিচ / দূরত্ব (ইঞ্চি)</label><input id="spP" type="number" value="3" min=".1" step=".1"></div>
+<div><label>শুরু ও শেষ অতিরিক্ত দৈর্ঘ্য (ফুট, মোট)</label><input id="spExtra" type="number" value="2" min="0" step=".1"></div>
+<div><label>ওয়েস্টেজ (%)</label><input id="spWaste" type="number" value="5" min="0" step=".5"></div>
+</div><button onclick="calcSp()">স্পাইরাল হিসাব করুন</button>
+</div>
+<div id="bm" class="section hide">
+<h2>২. বিমের রড (Beam Reinforcement Quantity)</h2>
+<div class="grid">
+<div><label>বিমের দৈর্ঘ্য (ফুট)</label><input id="bmL" type="number" value="15" min=".1" step=".1"></div>
+<div><label>বিমের প্রস্থ (ইঞ্চি)</label><input id="bmB" type="number" value="9" min=".1" step=".1"></div>
+<div><label>বিমের উচ্চতা (ইঞ্চি)</label><input id="bmD" type="number" value="18" min=".1" step=".1"></div>
+<div><label>কভার (ইঞ্চি)</label><input id="bmC" type="number" value="1.5" min="0" step=".125"></div>
+<div><label>নিচের প্রধান রড: সংখ্যা</label><input id="bmBotN" type="number" value="3" min="0" step="1"></div>
+<div><label>নিচের রড ডায়া (মিমি)</label><select id="bmBotDia"><option>10</option><option selected>12</option><option>16</option><option>20</option><option>22</option><option>25</option></select></div>
+<div><label>উপরের প্রধান রড: সংখ্যা</label><input id="bmTopN" type="number" value="2" min="0" step="1"></div>
+<div><label>উপরের রড ডায়া (মিমি)</label><select id="bmTopDia"><option>10</option><option selected>12</option><option>16</option><option>20</option><option>22</option><option>25</option></select></div>
+<div><label>অতিরিক্ত / সাপোর্ট রড: সংখ্যা</label><input id="bmAddN" type="number" value="0" min="0" step="1"></div>
+<div><label>অতিরিক্ত রড ডায়া (মিমি)</label><select id="bmAddDia"><option>10</option><option>12</option><option selected>16</option><option>20</option><option>22</option><option>25</option></select></div>
+<div><label>প্রতি প্রধান রডে অতিরিক্ত দৈর্ঘ্য (ফুট, দুই প্রান্ত মোট)</label><input id="bmExtra" type="number" value="2" min="0" step=".1"></div>
+<div><label>স্টিরাপ / রিং ডায়া (মিমি)</label><select id="bmStDia"><option selected>8</option><option>10</option><option>12</option></select></div>
+<div><label>স্টিরাপ স্পেসিং (ইঞ্চি)</label><input id="bmSp" type="number" value="6" min=".1" step=".1"></div>
+<div><label>স্টিরাপ হুকের মোট দৈর্ঘ্য (ইঞ্চি, প্রতি রিং)</label><input id="bmHook" type="number" value="8" min="0" step=".5"></div>
+<div><label>ওয়েস্টেজ (%)</label><input id="bmWaste" type="number" value="5" min="0" step=".5"></div>
+</div><button onclick="calcBm()">বিমের হিসাব করুন</button>
+</div>
+<div id="tc" class="section hide">
+<h2>৩. টাই কলাম (Tie Column)</h2>
+<div class="grid">
+<div><label>কলামের উচ্চতা (ফুট)</label><input id="tcH" type="number" value="10" min=".1" step=".1"></div>
+<div><label>কলামের এক পাশ (ইঞ্চি)</label><input id="tcB" type="number" value="12" min=".1" step=".1"></div>
+<div><label>কলামের অন্য পাশ (ইঞ্চি)</label><input id="tcD" type="number" value="12" min=".1" step=".1"></div>
+<div><label>কভার (ইঞ্চি)</label><input id="tcC" type="number" value="1.5" min="0" step=".125"></div>
+<div><label>লম্বালম্বি মেইন রডের সংখ্যা</label><input id="tcN" type="number" value="4" min="1" step="1"></div>
+<div><label>মেইন রড ডায়া (মিমি)</label><select id="tcDia"><option>10</option><option selected>12</option><option>16</option><option>20</option><option>22</option><option>25</option></select></div>
+<div><label>টাই / রিং ডায়া (মিমি)</label><select id="tcTieDia"><option selected>8</option><option>10</option><option>12</option></select></div>
+<div><label>টাই / রিং স্পেসিং (ইঞ্চি)</label><input id="tcSp" type="number" value="6" min=".1" step=".1"></div>
+<div><label>প্রতি রিংয়ে হুকের মোট দৈর্ঘ্য (ইঞ্চি)</label><input id="tcHook" type="number" value="8" min="0" step=".5"></div>
+<div><label>মেইন রডের ল্যাপ/অতিরিক্ত (ফুট, প্রতি রডে)</label><input id="tcLap" type="number" value="2" min="0" step=".1"></div>
+<div><label>ওয়েস্টেজ (%)</label><input id="tcWaste" type="number" value="5" min="0" step=".5"></div>
+</div><button onclick="calcTc()">টাই কলামের হিসাব করুন</button>
+</div>
+</section>
+<section class="panel"><h2>📊 হিসাবের ফলাফল</h2><div class="cards">
+<div class="metric"><small>মোট রডের দৈর্ঘ্য</small><strong id="outM">—</strong><small>মিটার</small></div>
+<div class="metric"><small>মোট রডের ওজন</small><strong id="outKg">—</strong><small>কেজি (ওয়েস্টেজসহ)</small></div>
+<div class="metric"><small>আনুমানিক ১২ মিটার রড</small><strong id="out12">—</strong><small>টি</small></div>
+<div class="metric"><small>রডের ডায়া / আইটেম</small><strong id="outDia">—</strong><small>মিমি</small></div>
+</div><table><thead><tr><th>বিবরণ</th><th>পরিমাণ</th></tr></thead><tbody id="resultRows"><tr><td colspan="2">উপরের ফর্ম থেকে হিসাব করুন।</td></tr></tbody></table>
+<div class="formula"><b>রডের ওজনের সূত্র:</b> প্রতি মিটারে ওজন = D² ÷ 162 কেজি, যেখানে D = রডের ব্যাস মিমিতে। মোট ওজন = মোট দৈর্ঘ্য (মিটার) × D² ÷ 162।</div>
+</section>
+<section class="panel muted">
+<h3>ব্যবহৃত সাধারণ সূত্র</h3>
+<p><b>স্পাইরাল:</b> প্রতি পাকের দৈর্ঘ্য = √[(π × কোরের ব্যাস)² + পিচ²]; মোট দৈর্ঘ্য = প্রতি পাকের দৈর্ঘ্য × (কলামের উচ্চতা ÷ পিচ) + অতিরিক্ত।</p>
+<p><b>বিমের প্রধান রড:</b> রডের সংখ্যা × (বিমের দৈর্ঘ্য + অনুমোদিত অতিরিক্ত/অ্যাঙ্করেজ)। স্টিরাপ সংখ্যা ≈ (বিমের দৈর্ঘ্য × ১২ ÷ স্পেসিং) + ১। স্টিরাপের কাটিং দৈর্ঘ্য = ২ × [ভিতরের প্রস্থ + ভিতরের উচ্চতা] + হুকের দৈর্ঘ্য।</p>
+<p><b>টাই কলাম:</b> মেইন রড = রডের সংখ্যা × (কলামের উচ্চতা + অনুমোদিত ল্যাপ/অ্যাঙ্করেজ)। টাই সংখ্যা ≈ (কলামের উচ্চতা × ১২ ÷ স্পেসিং) + ১। টাই কাটিং দৈর্ঘ্য = ২ × [কলামের দুই দিক − ২ × কভার] + হুকের দৈর্ঘ্য।</p>
+<p>ওজনের হিসাব ডায়া অনুযায়ী আলাদা আলাদা করা হয়। এই সংস্করণে বিম/কলামের প্রতিটি রড-গ্রুপের দৈর্ঘ্য ও ওজনের সারাংশ দেখানো হয়। স্টিরাপ/টাইয়ের ডায়া আলাদা হলে সেটির ওজন আলাদা গণনা করা হয়েছে।</p>
+</section></div>
+<script>
+const $=id=>document.getElementById(id),v=id=>Number($(id).value),fmt=(x,d=2)=>Number(x).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+function show(id){document.querySelectorAll('.section').forEach(x=>x.classList.add('hide'));$(id).classList.remove('hide');document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));({sp:'btnSp',bm:'btnBm',tc:'btnTc'})[id]&&$(({sp:'btnSp',bm:'btnBm',tc:'btnTc'})[id]).classList.add('active')}
+function weight(lenM,d){return lenM*d*d/162}
+function render(items){
+ let sumM=items.reduce((s,x)=>s+x.m,0),sumKg=items.reduce((s,x)=>s+x.kg,0);
+ $('outM').textContent=fmt(sumM);$('outKg').textContent=fmt(sumKg);
+ $('out12').textContent=Math.ceil(sumM/12);$('outDia').textContent=[...new Set(items.map(x=>x.d))].join(', ');
+ $('resultRows').innerHTML=items.map(x=>`<tr><td>${x.name} (${x.d} mm)</td><td>${fmt(x.m)} মিটার | ${fmt(x.kg)} কেজি</td></tr>`).join('')+`<tr><th>মোট</th><th>${fmt(sumM)} মিটার | ${fmt(sumKg)} কেজি</th></tr>`;
+}
+function calcSp(){
+ let H=v('spH')*12,D=(v('spD')-2*v('spC'))*25.4,p=v('spP')*25.4,d=v('spDia'),extra=v('spExtra')*.3048,w=v('spWaste')/100;
+ if(H<=0||D<=0||p<=0||d<=0||w<0){alert('ইনপুট যাচাই করুন');return}
+ let turns=H/p,per=Math.sqrt((Math.PI*D)**2+p*p)/1000,total=(turns*per+extra)*(1+w);
+ render([{name:'স্পাইরাল হেলিক্যাল রড; পাক ≈ '+fmt(turns,1),d,m:total,kg:weight(total,d)}]);
+}
+function calcBm(){
+ let L=v('bmL')*.3048,B=v('bmB')*25.4/1000,D=v('bmD')*25.4/1000,C=v('bmC')*25.4/1000;
+ let waste=v('bmWaste')/100,ex=v('bmExtra')*.3048,sp=v('bmSp')*.0254,hook=v('bmHook')*.0254,sd=v('bmStDia');
+ if(L<=0||B<=0||D<=0||sp<=0){alert('ইনপুট যাচাই করুন');return}
+ let items=[];
+ [['নিচের প্রধান রড',v('bmBotN'),v('bmBotDia')],['উপরের প্রধান রড',v('bmTopN'),v('bmTopDia')],['অতিরিক্ত রড',v('bmAddN'),v('bmAddDia')]].forEach(([name,n,d])=>{if(n>0){let m=n*(L+ex)*(1+waste);items.push({name,d,m,kg:weight(m,d)})}});
+ let nst=Math.ceil(L/sp)+1,insideB=Math.max(0,B-2*C),insideD=Math.max(0,D-2*C);
+ let cut=2*(insideB+insideD)+hook,stM=nst*cut*(1+waste);
+ items.push({name:'স্টিরাপ / রিং; সংখ্যা '+nst,d:sd,m:stM,kg:weight(stM,sd)});
+ render(items);
+}
+function calcTc(){
+ let H=v('tcH')*.3048,B=v('tcB')*25.4/1000,D=v('tcD')*25.4/1000,C=v('tcC')*25.4/1000;
+ let N=v('tcN'),md=v('tcDia'),td=v('tcTieDia'),sp=v('tcSp')*.0254,hook=v('tcHook')*.0254,lap=v('tcLap')*.3048,w=v('tcWaste')/100;
+ if(H<=0||B<=0||D<=0||N<1||sp<=0){alert('ইনপুট যাচাই করুন');return}
+ let mainM=N*(H+lap)*(1+w),nt=Math.ceil(H/sp)+1;
+ let tieCut=2*(Math.max(0,B-2*C)+Math.max(0,D-2*C))+hook,tieM=nt*tieCut*(1+w);
+ render([{name:'লম্বালম্বি মেইন রড; সংখ্যা '+N, d:md,m:mainM,kg:weight(mainM,md)},{name:'টাই / রিং; সংখ্যা '+nt,d:td,m:tieM,kg:weight(tieM,td)}]);
+}
+</script></body></html>

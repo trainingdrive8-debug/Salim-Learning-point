@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>মাটি কাটা ও ভরাটের হিসাব</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6f8;color:#17212b;font-family:Arial,"Noto Sans Bengali",sans-serif;line-height:1.5}.wrap{max-width:980px;margin:22px auto;padding:14px}.head{background:#174b67;color:#fff;padding:22px;border-radius:14px}.head h1{margin:0 0 6px;font-size:25px}.head p{margin:0;color:#e4f1f7}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.card{background:white;border:1px solid #dce5ea;border-radius:12px;padding:16px;margin-top:14px}.card h2{font-size:19px;margin:0 0 12px;color:#174b67}.field{margin:10px 0}.field label{display:block;font-weight:600;font-size:14px;margin-bottom:5px}.field input,.field select{width:100%;padding:11px;border:1px solid #bdcbd3;border-radius:8px;font-size:16px;background:#fff}.hint{font-size:12px;color:#61717b}.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.result{background:#edf5f8;padding:13px;border-radius:9px}.result span{display:block;font-size:13px;color:#50616c}.result strong{font-size:21px;color:#174b67}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}button{border:0;border-radius:8px;padding:11px 17px;background:#17658b;color:white;font-weight:700;cursor:pointer}button.secondary{background:#52636d}.formula{background:#f7f8f5;padding:12px;border-radius:8px;overflow-wrap:anywhere}.warn{font-size:13px;color:#75551b;background:#fff6df;padding:12px;border-radius:8px;margin-top:12px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #e0e6e9;padding:9px;text-align:left}th{color:#174b67}@media print{body{background:#fff}.wrap{margin:0;max-width:none}.actions{display:none}.card,.head{break-inside:avoid}}
+</style></head>
+<body><main class="wrap">
+<header class="head"><h1>🏗️ মাটি কাটা ও ভরাটের হিসাব</h1><p>Excavation & Earth Filling Quantity Calculator</p></header>
+<section class="card"><h2>১. মাটি কাটার পরিমাপ</h2><div class="grid">
+<div class="field"><label>দৈর্ঘ্য (ফুট)</label><input id="el" type="number" min="0" step="any" value="50"></div>
+<div class="field"><label>প্রস্থ (ফুট)</label><input id="ew" type="number" min="0" step="any" value="30"></div>
+<div class="field"><label>গড় কাটার গভীরতা (ফুট)</label><input id="ed" type="number" min="0" step="any" value="2"></div>
+<div class="field"><label>মাটি ফুলে যাওয়ার হার / Swell (%)</label><input id="swell" type="number" min="0" step="any" value="25"><div class="hint">খননের পর আলগা মাটির আয়তন বৃদ্ধির আনুমানিক হার</div></div>
+</div><div class="hint">আয়তন = দৈর্ঘ্য × প্রস্থ × গড় গভীরতা। অসমতল জমির ক্ষেত্রে কয়েকটি অংশে ভাগ করে হিসাব যোগ করুন।</div></section>
+<section class="card"><h2>২. মাটি ভরাটের পরিমাপ</h2><div class="grid">
+<div class="field"><label>ভরাটের দৈর্ঘ্য (ফুট)</label><input id="fl" type="number" min="0" step="any" value="40"></div>
+<div class="field"><label>ভরাটের প্রস্থ (ফুট)</label><input id="fw" type="number" min="0" step="any" value="20"></div>
+<div class="field"><label>কম্প্যাক্টেড ভরাটের পুরুত্ব (ফুট)</label><input id="fd" type="number" min="0" step="any" value="1.5"></div>
+<div class="field"><label>কম্প্যাকশনের জন্য অতিরিক্ত আলগা মাটি (%)</label><input id="compact" type="number" min="0" step="any" value="20"><div class="hint">কম্প্যাক্টেড ভলিউমের ওপর অতিরিক্ত মাটি; প্রকল্পভেদে পরিবর্তনশীল</div></div>
+</div></section>
+<section class="card"><h2>৩. হিসাবের ফলাফল</h2><div class="results" id="results"></div>
+<div class="actions"><button onclick="calc()">হিসাব করুন</button><button class="secondary" onclick="window.print()">প্রিন্ট / PDF</button><button class="secondary" onclick="resetAll()">রিসেট</button></div></section>
+<section class="card"><h2>৪. সূত্র</h2>
+<div class="formula"><b>মাটি কাটার (Bank Volume):</b><br>দৈর্ঘ্য × প্রস্থ × গড় গভীরতা = CFT<br><br><b>খননের পর আলগা মাটি:</b><br>Bank Volume × (1 + Swell% ÷ 100)<br><br><b>কম্প্যাক্টেড ভরাটের পরিমাণ:</b><br>দৈর্ঘ্য × প্রস্থ × ভরাটের পুরুত্ব<br><br><b>ভরাটের জন্য প্রয়োজনীয় আলগা মাটি:</b><br>Compacted Fill Volume × (1 + অতিরিক্ত মাটি% ÷ 100)<br><br><b>রূপান্তর:</b> ১ ঘনফুট = ০.০২৮৩১৬৮ ঘনমিটার; ১ ঘনমিটার = ৩৫.৩১৪৭ ঘনফুট।</div>
+<div class="warn"><b>গুরুত্বপূর্ণ:</b> Swell ও কম্প্যাকশন allowance মাটির ধরন, আর্দ্রতা, পরিবহন এবং কম্প্যাকশন পদ্ধতির ওপর নির্ভর করে। এখানে দেওয়া ২৫% ও ২০% কেবল উদাহরণ—সাইটের Soil Test/প্রকৌশলীর নির্দেশনা অনুযায়ী পরিবর্তন করুন। কাটা মাটি ভরাটে ব্যবহারযোগ্য কি না (জৈব মাটি, কাদা, আবর্জনা ইত্যাদি) যাচাই করুন। সাইড স্লোপ, working space, topsoil stripping, পানি নিষ্কাশন ও অপচয় এই সাধারণ আয়তনে অন্তর্ভুক্ত নয়।</div></section>
+</main>
+<script>
+const ids=['el','ew','ed','swell','fl','fw','fd','compact'];
+function val(id){let x=parseFloat(document.getElementById(id).value);return Number.isFinite(x)&&x>=0?x:0}
+function fmt(n){return n.toLocaleString('en-US',{maximumFractionDigits:2})}
+function card(label,value,unit){return `<div class="result"><span>${label}</span><strong>${fmt(value)} ${unit}</strong></div>`}
+function calc(){
+ const bank=val('el')*val('ew')*val('ed');
+ const loose=bank*(1+val('swell')/100);
+ const fill=val('fl')*val('fw')*val('fd');
+ const fillLoose=fill*(1+val('compact')/100);
+ const diff=loose-fillLoose;
+ document.getElementById('results').innerHTML=
+ card('মাটি কাটার পরিমাণ',bank,'CFT')+card('মাটি কাটার পরিমাণ',bank/35.3147,'m³')+
+ card('খননের পর আলগা মাটি',loose,'CFT')+card('আলগা মাটি',loose/35.3147,'m³')+
+ card('কম্প্যাক্টেড ভরাট',fill,'CFT')+card('কম্প্যাক্টেড ভরাট',fill/35.3147,'m³')+
+ card('ভরাটের জন্য আলগা মাটি',fillLoose,'CFT')+card('ভরাটের জন্য আলগা মাটি',fillLoose/35.3147,'m³')+
+ card(diff>=0?'সম্ভাব্য উদ্বৃত্ত আলগা মাটি':'সম্ভাব্য অতিরিক্ত মাটির প্রয়োজন',Math.abs(diff),'CFT');
+}
+function resetAll(){document.getElementById('el').value=50;document.getElementById('ew').value=30;document.getElementById('ed').value=2;document.getElementById('swell').value=25;document.getElementById('fl').value=40;document.getElementById('fw').value=20;document.getElementById('fd').value=1.5;document.getElementById('compact').value=20;calc()}
+ids.forEach(id=>document.getElementById(id).addEventListener('input',calc));calc();
+</script></body></html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paint Quantity Calculator | Salim Construction</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:#202b3c;font-family:Arial,"Noto Sans Bengali",sans-serif}.wrap{max-width:1100px;margin:22px auto;padding:15px}.hero{padding:24px;border-radius:16px;color:#fff;background:linear-gradient(120deg,#12345a,#267bb5)}h1{margin:0 0 8px;font-size:27px}.hero p{margin:0}.panel{background:white;border:1px solid #dbe3ed;border-radius:14px;padding:19px;margin-top:15px;box-shadow:0 4px 14px #1d293910}h2{font-size:20px;margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px}.field label{font-weight:700;font-size:14px;display:block;margin-bottom:6px}.field input,.field select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;font-size:15px;background:#fff}.hint{font-size:12px;color:#667085;margin-top:4px;line-height:1.4}.btn{border:0;border-radius:9px;padding:12px 18px;font-weight:bold;font-size:15px;margin:12px 7px 0 0;cursor:pointer}.go{background:#1769aa;color:white}.alt{background:#e8eef5;color:#12345a}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:11px;margin-top:15px}.metric{background:#f0f7ff;border:1px solid #d4e8fb;border-radius:10px;padding:13px}.metric span{display:block;font-size:13px;color:#526174}.metric b{display:block;font-size:21px;color:#12345a;margin-top:5px}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:700px}th,td{padding:10px;border-bottom:1px solid #e5eaf0;text-align:left;font-size:14px}th{background:#f4f7fb}.formula{background:#f7f9fc;border-left:4px solid #16804a;padding:13px;line-height:1.8;border-radius:8px}.note{font-size:13px;line-height:1.65;color:#667085}.swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:9px}.swatch{border:1px solid #d9e0e8;border-radius:9px;overflow:hidden}.color{height:36px}.swatch div:last-child{padding:7px;font-size:12px}.warning{color:#9a3412;background:#fff7ed;padding:12px;border-radius:9px;line-height:1.6}
+@media print{body{background:#fff}.wrap{margin:0;max-width:none}.hero{background:#fff;color:#000;border:1px solid #aaa}.panel{box-shadow:none;break-inside:avoid}.btn{display:none}}
+</style></head>
+<body><main class="wrap">
+<header class="hero"><h1>রঙের পরিমাণ ও খরচের প্রস্তুতি ক্যালকুলেটর</h1><p>Weather Coat, Sealer Coat, Synthetic Enamel, Exterior Paint ও Interior Paint-এর প্রয়োজনীয় উপকরণ হিসাব করুন</p></header>
+
+<section class="panel"><h2>১. কাজের মাপ দিন</h2><div class="grid">
+<div class="field"><label>কাজের ধরন</label><select id="surface"><option value="new">নতুন প্লাস্টার / নতুন সারফেস</option><option value="old">পুরাতন রং করা সারফেস</option><option value="metal">লোহা / কাঠের সারফেস</option></select></div>
+<div class="field"><label>দেয়াল / সারফেসের মোট দৈর্ঘ্য</label><input id="length" type="number" value="40" min="0" step="any"><div class="hint">ফুটে (ft)</div></div>
+<div class="field"><label>দেয়াল / সারফেসের উচ্চতা</label><input id="height" type="number" value="10" min="0" step="any"><div class="hint">ফুটে (ft)</div></div>
+<div class="field"><label>দরজা-জানালার বাদ দেওয়ার জায়গা</label><input id="deduct" type="number" value="40" min="0" step="any"><div class="hint">বর্গফুট (sq ft)</div></div>
+<div class="field"><label>অতিরিক্ত / অপচয়</label><input id="waste" type="number" value="10" min="0" step="any"><div class="hint">শতাংশ (%)</div></div>
+<div class="field"><label>রংয়ের প্যাক সাইজ</label><select id="pack"><option value="1">লিটার (L)</option><option value="4">৪ লিটার</option><option value="18">১৮ লিটার</option></select></div>
+</div>
+<button class="btn go" onclick="calc()">হিসাব করুন</button><button class="btn alt" onclick="resetAll()">রিসেট</button><button class="btn alt" onclick="window.print()">প্রিন্ট / PDF</button>
+<div id="error" style="color:#b42318;font-weight:bold;margin-top:10px"></div>
+<div class="cards"><div class="metric"><span>মোট দেয়ালের ক্ষেত্রফল</span><b id="gross">— sq ft</b></div><div class="metric"><span>বাদ দেওয়ার পর নেট ক্ষেত্রফল</span><b id="net">— sq ft</b></div><div class="metric"><span>অপচয়সহ হিসাবের ক্ষেত্রফল</span><b id="area">— sq ft</b></div></div>
+</section>
+
+<section class="panel"><h2>২. কোন ধরনের রং করবেন?</h2><div class="grid">
+<div class="field"><label>পেইন্ট সিস্টেম নির্বাচন</label><select id="system" onchange="setDefaults()">
+<option value="interior">Interior Paint (ইন্টেরিয়র)</option><option value="exterior">Exterior Paint (এক্সটেরিয়র)</option><option value="weather">Weather Coat (ওয়েদার কোট)</option><option value="water">Water Coat / Distemper (ওয়াটার কোট)</option><option value="enamel">Synthetic Enamel Paint (সিনথেটিক এনামেল)</option><option value="custom">নিজে সেট করুন</option></select></div>
+<div class="field"><label>Sealer / Primer-এর কোট</label><input id="primerCoats" type="number" min="0" step="1" value="1"></div>
+<div class="field"><label>Putty-এর কোট</label><input id="puttyCoats" type="number" min="0" step="1" value="2"></div>
+<div class="field"><label>মূল রংয়ের কোট</label><input id="paintCoats" type="number" min="1" step="1" value="2"></div>
+<div class="field"><label>Sealer / Primer-এর কভারেজ</label><input id="primerCov" type="number" min="1" step="any" value="100"><div class="hint">প্রতি লিটারে বর্গফুট / কোট</div></div>
+<div class="field"><label>Putty কভারেজ</label><input id="puttyCov" type="number" min="1" step="any" value="25"><div class="hint">প্রতি কেজিতে বর্গফুট / কোট (আনুমানিক)</div></div>
+<div class="field"><label>মূল রংয়ের কভারেজ</label><input id="paintCov" type="number" min="1" step="any" value="100"><div class="hint">প্রতি লিটারে বর্গফুট / কোট</div></div>
+<div class="field"><label>Thinner / পানি মেশানোর হার</label><input id="dilution" type="number" min="0" step="any" value="5"><div class="hint">রংয়ের পরিমাণের শতাংশ; প্রস্তুতকারকের নির্দেশ মানুন</div></div>
+</div>
+<p class="note">ডিফল্ট কভারেজ প্রাথমিক আনুমানিক মান। পৃষ্ঠের শোষণ, রংয়ের ব্র্যান্ড, রংয়ের মান ও প্রয়োগ পদ্ধতি অনুযায়ী কভারেজ পরিবর্তিত হবে। পণ্যের ক্যান/ডেটাশিটে দেওয়া কভারেজ অনুযায়ী ইনপুট পরিবর্তন করুন।</p>
+</section>
+
+<section class="panel"><h2>৩. প্রয়োজনীয় উপকরণের হিসাব</h2><div class="tablewrap"><table><thead><tr><th>উপকরণ</th><th>কোট</th><th>কভারেজ ইনপুট</th><th>প্রয়োজন</th><th>একক</th></tr></thead><tbody>
+<tr><td id="primerName">Sealer / Primer</td><td id="pcoatOut">—</td><td id="pcovOut">—</td><td id="primerOut">—</td><td>লিটার</td></tr>
+<tr><td>Wall Putty</td><td id="puttyCoatOut">—</td><td id="puttyCovOut">—</td><td id="puttyOut">—</td><td>কেজি</td></tr>
+<tr><td id="paintName">Interior Paint</td><td id="paintCoatOut">—</td><td id="paintCovOut">—</td><td id="paintOut">—</td><td>লিটার</td></tr>
+<tr><td>Thinner / পানি (আনুমানিক)</td><td>—</td><td id="dilOut">—</td><td id="dilutionOut">—</td><td>লিটার</td></tr>
+<tr><td>Sandpaper (ঘষার কাগজ)</td><td>—</td><td>প্রতি ১০০ sq ft-এ ২–৩টি</td><td id="sandOut">—</td><td>টি</td></tr>
+</tbody></table></div>
+<div class="cards"><div class="metric"><span>Sealer / Primer</span><b id="primerPack">—</b></div><div class="metric"><span>মূল রং</span><b id="paintPack">—</b></div><div class="metric"><span>Putty</span><b id="puttyPack">—</b></div></div>
+<p class="note">প্যাক সাইজ নির্বাচন করলে পূর্ণ প্যাকের আনুমানিক সংখ্যা দেখাবে। Putty কেজিতে হিসাব করা হয়; বাজারের প্যাকেটের ওজন অনুযায়ী কিনুন।</p>
+</section>
+
+<section class="panel"><h2>৪. রংয়ের নাম ও সাধারণ রঙের তালিকা</h2><p class="note">নিচের রঙগুলো নমুনা মাত্র। প্রকৃত শেড/কোড ব্র্যান্ডভেদে আলাদা; রং কেনার আগে শেড কার্ড দেখে নিশ্চিত করুন।</p>
+<div class="swatches">
+<div class="swatch"><div class="color" style="background:#ffffff"></div><div>সাদা (White) #FFFFFF</div></div>
+<div class="swatch"><div class="color" style="background:#f5f0df"></div><div>অফ-হোয়াইট (Off White)</div></div>
+<div class="swatch"><div class="color" style="background:#e8d9b5"></div><div>আইভরি (Ivory)</div></div>
+<div class="swatch"><div class="color" style="background:#d8c3a5"></div><div>বেইজ (Beige)</div></div>
+<div class="swatch"><div class="color" style="background:#c7d7e8"></div><div>স্কাই ব্লু (Sky Blue)</div></div>
+<div class="swatch"><div class="color" style="background:#6e9fc7"></div><div>ব্লু (Blue)</div></div>
+<div class="swatch"><div class="color" style="background:#b9c9ad"></div><div>হালকা সবুজ (Light Green)</div></div>
+<div class="swatch"><div class="color" style="background:#54745b"></div><div>গাঢ় সবুজ (Dark Green)</div></div>
+<div class="swatch"><div class="color" style="background:#d8b2a2"></div><div>পিচ (Peach)</div></div>
+<div class="swatch"><div class="color" style="background:#c98272"></div><div>টেরাকোটা (Terracotta)</div></div>
+<div class="swatch"><div class="color" style="background:#b8a0c9"></div><div>ল্যাভেন্ডার (Lavender)</div></div>
+<div class="swatch"><div class="color" style="background:#9da3aa"></div><div>গ্রে (Grey)</div></div>
+<div class="swatch"><div class="color" style="background:#d9b94d"></div><div>হলুদ (Yellow)</div></div>
+<div class="swatch"><div class="color" style="background:#a84c43"></div><div>মেরুন (Maroon)</div></div>
+<div class="swatch"><div class="color" style="background:#3c4148"></div><div>চারকোল (Charcoal)</div></div>
+<div class="swatch"><div class="color" style="background:#b68a5a"></div><div>ব্রাউন (Brown)</div></div>
+</div>
+</section>
+
+<section class="panel"><h2>৫. কাজ অনুযায়ী কী কী লাগবে?</h2>
+<div class="tablewrap"><table><thead><tr><th>রংয়ের ধরন</th><th>সাধারণ কাজের ধাপ</th><th>ব্যবহৃত উপকরণ</th></tr></thead><tbody>
+<tr><td>Interior Paint</td><td>সারফেস পরিষ্কার → প্রয়োজনমতো পুটি → স্যান্ডিং → ১ কোট সিলার/প্রাইমার → ২ কোট রং</td><td>Wall putty, interior wall sealer/primer, interior emulsion paint, sandpaper, roller/brush</td></tr>
+<tr><td>Exterior Paint</td><td>শেওলা/ধুলা পরিষ্কার → ফাটল মেরামত → উপযুক্ত প্রাইমার → ২ কোট বাহিরের রং</td><td>Exterior primer, exterior weather-resistant paint, crack filler/putty (উপযোগী হলে), sandpaper, roller/brush</td></tr>
+<tr><td>Weather Coat</td><td>সারফেস শুকানো ও পরিষ্কার → প্রস্তুতকারক নির্ধারিত প্রাইমার → ২ কোট Weather Coat</td><td>Weather coat exterior paint, compatible primer, crack filler, roller/brush</td></tr>
+<tr><td>Water Coat / Distemper</td><td>পুরোনো আলগা রং তুলে → পুটি/স্যান্ডিং → প্রয়োজনমতো প্রাইমার → ২ কোট</td><td>Water-based distemper, উপযুক্ত primer, wall putty, পানি (নির্দেশনা অনুযায়ী), brush/roller</td></tr>
+<tr><td>Synthetic Enamel</td><td>লোহা/কাঠ পরিষ্কার ও ঘষা → উপযুক্ত প্রাইমার → ২ কোট এনামেল</td><td>Metal হলে red oxide/anti-corrosive primer; wood হলে wood primer; synthetic enamel, manufacturer-approved thinner, brush</td></tr>
+</tbody></table></div>
+<div class="warning"><b>সতর্কতা:</b> Synthetic Enamel সাধারণত লোহা/কাঠের মতো সারফেসে ব্যবহার হয়; দেয়ালের emulsion paint-এর বিকল্প নয়। GI/গ্যালভানাইজড ধাতুতে সাধারণ red oxide primer ব্যবহার না করে galvanised surface-এর জন্য অনুমোদিত primer বেছে নিন। একইভাবে Weather Coat-এর জন্য নির্দিষ্ট ব্র্যান্ডের compatible primer ব্যবহার করুন।</div>
+</section>
+<section class="panel"><h2>৬. হিসাবের সূত্র</h2><div class="formula">
+ক্ষেত্রফল (sq ft) = দৈর্ঘ্য (ft) × উচ্চতা (ft) − দরজা/জানালার ক্ষেত্রফল<br>
+হিসাবের ক্ষেত্রফল = নেট ক্ষেত্রফল × (1 + অপচয়% ÷ 100)<br>
+রং (লিটার) = হিসাবের ক্ষেত্রফল × কোট সংখ্যা ÷ প্রতি লিটারের কভারেজ<br>
+Putty (kg) = হিসাবের ক্ষেত্রফল × পুটি কোট সংখ্যা ÷ প্রতি কেজির কভারেজ<br>
+Thinner/পানি = মূল রংয়ের লিটার × মেশানোর হার% ÷ 100
+</div><p class="note">এটি প্রাথমিক পরিমাণ নির্ণয়ের টুল, চূড়ান্ত BOQ নয়। একাধিক দেয়াল হলে দৈর্ঘ্য × উচ্চতার মোট ক্ষেত্রফল যোগ করে দিন। সিলিং, কলাম, বিম, দরজা-জানালা বা আলাদা রঙের অংশের ক্ষেত্রফল আলাদাভাবে যোগ/বাদ দিন।</p></section>
+<footer class="note" style="text-align:center;padding:18px">Salim Construction & Engineering Calculator</footer>
+</main>
+<script>
+const names={interior:'Interior Emulsion Paint',exterior:'Exterior Paint',weather:'Weather Coat',water:'Water Coat / Distemper',enamel:'Synthetic Enamel Paint',custom:'Custom Paint'};
+const defaults={interior:[1,2,2,100,25,100,5],exterior:[1,1,2,100,25,90,5],weather:[1,0,2,100,25,80,5],water:[1,2,2,100,25,120,5],enamel:[1,0,2,100,0,100,10],custom:[1,2,2,100,25,100,5]};
+function setDefaults(){let v=defaults[document.getElementById('system').value];['primerCoats','puttyCoats','paintCoats','primerCov','puttyCov','paintCov','dilution'].forEach((id,i)=>document.getElementById(id).value=v[i]);calc()}
+function val(id){return Number(document.getElementById(id).value)}
+function fmt(x,d=2){return Number(x).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function calc(){
+let gross=val('length')*val('height'),ded=val('deduct'),w=val('waste'),net=gross-ded;
+let err=document.getElementById('error');err.textContent='';
+if(!(val('length')>0&&val('height')>0&&ded>=0&&net>0&&w>=0&&val('primerCoats')>=0&&val('puttyCoats')>=0&&val('paintCoats')>=1&&val('primerCov')>0&&val('paintCov')>0&&val('puttyCov')>0&&val('dilution')>=0)){err.textContent='অনুগ্রহ করে সব ইনপুট সঠিকভাবে দিন। বাদ দেওয়া ক্ষেত্রফল মোট ক্ষেত্রফলের চেয়ে কম হতে হবে।';return}
+let area=net*(1+w/100),pc=val('primerCoats'),putc=val('puttyCoats'),paintc=val('paintCoats');
+let primer=area*pc/val('primerCov'),putty=area*putc/val('puttyCov'),paint=area*paintc/val('paintCov'),dil=paint*val('dilution')/100;
+let pack=val('pack'),sys=document.getElementById('system').value;
+document.getElementById('gross').textContent=fmt(gross)+' sq ft';document.getElementById('net').textContent=fmt(net)+' sq ft';document.getElementById('area').textContent=fmt(area)+' sq ft';
+document.getElementById('primerName').textContent=sys==='enamel'?'Metal/Wood Primer':'Sealer / Compatible Primer';
+document.getElementById('paintName').textContent=names[sys];
+document.getElementById('pcoatOut').textContent=pc;document.getElementById('pcovOut').textContent=val('primerCov')+' sq ft/L/coat';document.getElementById('primerOut').textContent=fmt(primer);
+document.getElementById('puttyCoatOut').textContent=putc;document.getElementById('puttyCovOut').textContent=val('puttyCov')+' sq ft/kg/coat';document.getElementById('puttyOut').textContent=fmt(putty);
+document.getElementById('paintCoatOut').textContent=paintc;document.getElementById('paintCovOut').textContent=val('paintCov')+' sq ft/L/coat';document.getElementById('paintOut').textContent=fmt(paint);
+document.getElementById('dilOut').textContent=val('dilution')+'%';document.getElementById('dilutionOut').textContent=fmt(dil);document.getElementById('sandOut').textContent=Math.ceil(area/100*2.5);
+document.getElementById('primerPack').textContent=fmt(primer)+' L';document.getElementById('paintPack').textContent=fmt(paint)+' L ≈ '+Math.ceil(paint/pack)+' প্যাক ('+pack+' L)';document.getElementById('puttyPack').textContent=fmt(putty)+' kg';
+}
+function resetAll(){document.getElementById('surface').value='new';document.getElementById('length').value=40;document.getElementById('height').value=10;document.getElementById('deduct').value=40;document.getElementById('waste').value=10;document.getElementById('pack').value=1;document.getElementById('system').value='interior';setDefaults()}
+['length','height','deduct','waste','primerCoats','puttyCoats','paintCoats','primerCov','puttyCov','paintCov','dilution','pack'].forEach(id=>document.getElementById(id).addEventListener('input',calc));
+calc();
+</script></body></html>

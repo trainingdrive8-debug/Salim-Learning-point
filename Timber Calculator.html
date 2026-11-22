@@ -1,0 +1,501 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Timber Calculator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  /* Layout: four separate calculators (door, window, table, shuttering) as tabs. Each tab has inputs on the left and a live result with cut list on the right. */
+  :root {
+    --bg: #eef1f4;
+    --surface: #ffffff;
+    --surface-2: #e3e8ee;
+    --fg: #17202a;
+    --muted: #5b6876;
+    --line: #cfd7e0;
+    --accent: #0b6e99;
+    --accent-ink: #ffffff;
+    --accent-soft: #d6ebf5;
+    --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171d;
+      --surface: #1b232c;
+      --surface-2: #26313d;
+      --fg: #e8edf2;
+      --muted: #9aa8b6;
+      --line: #33404d;
+      --accent: #5cc0ec;
+      --accent-ink: #0b1620;
+      --accent-soft: #1d3a4a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12171d;
+    --surface: #1b232c;
+    --surface-2: #26313d;
+    --fg: #e8edf2;
+    --muted: #9aa8b6;
+    --line: #33404d;
+    --accent: #5cc0ec;
+    --accent-ink: #0b1620;
+    --accent-soft: #1d3a4a;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.55;
+    padding-block: 24px 40px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 1020px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  h1 { font-size: 1.85rem; line-height: 1.2; margin: 0; font-weight: 700; text-wrap: balance; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 6px 0 0; max-width: 70ch; }
+
+  /* tabs */
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tab {
+    font: inherit; font-weight: 600; cursor: pointer;
+    min-height: 46px; padding: 8px 20px; border-radius: 8px;
+    background: var(--surface); color: var(--fg); border: 1.5px solid var(--line);
+  }
+  .tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 1px;
+  }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 20px; align-items: start; }
+  @media (max-width: 800px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; min-width: 0; }
+  .panel h2 { font-size: 0.78rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 0 0 14px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  label { font-weight: 600; font-size: 0.92rem; }
+  .hint { color: var(--muted); font-size: 0.8rem; font-weight: 400; }
+  select, input {
+    font: inherit; color: var(--fg); background: var(--bg);
+    border: 1.5px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; width: 100%; min-height: 46px;
+  }
+  select:focus-visible, input:focus-visible { border-color: var(--accent); }
+  .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 12px; }
+  .pair .field.full { grid-column: 1 / -1; }
+  .opt, .adv { margin-top: 6px; padding-top: 16px; border-top: 1px dashed var(--line); }
+  .opt-t { font-size: 0.78rem; color: var(--muted); margin: 0 0 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+  details.adv summary { cursor: pointer; font-weight: 600; font-size: 0.92rem; min-height: 44px; display: flex; align-items: center; margin-top: -8px; }
+  details.adv[open] summary { margin-bottom: 8px; }
+
+  /* result */
+  .hero { display: flex; flex-direction: column; gap: 2px; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .hero .k { color: var(--muted); font-size: 0.88rem; }
+  .hero .v { font-size: 2.6rem; font-weight: 700; line-height: 1.15; color: var(--accent); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .hero .v small { font-size: 1.05rem; font-weight: 600; color: var(--fg); margin-left: 6px; }
+  .hero .eq { color: var(--muted); font-size: 0.88rem; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .tile { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+  .tile .tk { color: var(--muted); font-size: 0.8rem; }
+  .tile .tv { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+  .tt { font-size: 0.85rem; color: var(--muted); font-weight: 600; margin: 0 0 8px; }
+  .tbl { overflow-x: auto; margin-bottom: 16px; }
+  table { border-collapse: collapse; width: 100%; min-width: 440px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 0.78rem; color: var(--muted); font-weight: 600; background: var(--surface-2); }
+  tfoot td { font-weight: 700; border-bottom: 0; color: var(--accent); }
+  .note { color: var(--muted); font-size: 0.83rem; margin: 6px 0 0; max-width: 90ch; }
+  .err { color: #b3261e; font-weight: 600; }
+  :root[data-theme="dark"] .err { color: #ff8a80; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .err { color: #ff8a80; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Timber Calculator</h1>
+    <p class="sub">Separate calculators for a door, a window, a table and shuttering (formwork). Enter the sizes and get the timber in cubic feet, with a full cut list.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Calculator" id="tabs"></div>
+  <div id="panes"></div>
+
+  <section class="panel" aria-labelledby="gn-h">
+    <h2 id="gn-h">How the timber is measured</h2>
+    <p class="note" style="margin-top:0">Timber volume (cft) = length (ft) × width (in) × thickness (in) ÷ 144. 1 cft = 0.0283 m³. Sizes are finished sizes. Rough-sawn timber is usually sold a little oversize, so use the sizes you will actually buy. A joint allowance of 1 inch per end is added to rails, aprons and heads. Wastage is added on top of the net cut list for sawing loss. All results are estimates, so check them against your own drawing before you order.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  var CFT_M3 = 0.0283168;
+  var J = 2 / 12; // 1 in joint allowance at each end, in ft
+  var BN = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+
+  function $(id) { return document.getElementById(id); }
+  function en(s) { return String(s).replace(/[০-৯]/g, function (c) { return BN.indexOf(c); }).replace(/,/g, '').trim(); }
+  function fmt(n, dp) {
+    var s = (+n).toFixed(dp);
+    if (s.indexOf('.') > -1) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    var p = s.split('.');
+    p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return p.join('.');
+  }
+  function fl(x) { return Math.floor(x + 1e-9); }
+  function mk(name, pcs, len, w, t) {
+    var each = len * w * t / 144;
+    return { name: name, pcs: pcs, len: len, w: w, t: t, each: each, total: each * pcs };
+  }
+  function scale(rows, q) { return rows.map(function (r) { return mk(r.name, r.pcs * q, r.len, r.w, r.t); }); }
+  function sum(rows) { return rows.reduce(function (a, r) { return a + r.total; }, 0); }
+  function cutTable(title, rows, net) {
+    return {
+      title: title,
+      head: ['Member', 'Pcs', 'Length (ft)', 'Section (in)', 'cft / pc', 'Total cft'],
+      rows: rows.map(function (r) {
+        return [r.name, fmt(r.pcs, 0), fmt(r.len, 2), fmt(r.w, 2) + ' × ' + fmt(r.t, 2), fmt(r.each, 3), fmt(r.total, 3)];
+      }),
+      foot: ['Net total', '', '', '', '', fmt(net, 3)]
+    };
+  }
+  function timberResult(v, rows, eq, unit) {
+    var net = sum(rows), gross = net * (1 + v.waste / 100);
+    var tiles = [
+      { k: 'Net timber', v: fmt(net, 2) + ' cft' },
+      { k: 'Volume incl. wastage', v: fmt(gross * CFT_M3, 3) + ' m³' },
+      { k: 'Per ' + unit + ' (net)', v: fmt(net / v.qty, 2) + ' cft' }
+    ];
+    if (v.price > 0) tiles.push({ k: 'Estimated cost', v: '৳ ' + fmt(gross * v.price, 0) });
+    return {
+      hero: { k: 'Timber required (incl. ' + fmt(v.waste, 0) + '% wastage)', v: fmt(gross, 2), u: 'cft', eq: eq },
+      tiles: tiles,
+      tables: [cutTable('Cut list (net, before wastage)', rows, net)]
+    };
+  }
+
+  var COMMON_OPT = [
+    { k: 'waste', label: 'Wastage %', def: 10, g: 'opt', zero: true },
+    { k: 'price', label: 'Timber price', hint: '৳ / cft', def: '', ph: 'e.g. 4500', g: 'opt', blank: true }
+  ];
+
+  var TABS = [
+    /* ---------------- DOOR ---------------- */
+    {
+      key: 'door', label: 'Door',
+      fields: [
+        { k: 'H', label: 'Door height', hint: 'ft', def: 7 },
+        { k: 'W', label: 'Door width', hint: 'ft', def: 3 },
+        { k: 'type', label: 'Shutter type', sel: [['panel', 'Panel shutter'], ['solid', 'Solid timber shutter'], ['none', 'Frame only (no shutter)']], def: 'panel', full: true },
+        { k: 'qty', label: 'Number of doors', def: 1 },
+        { k: 'fw', label: 'Frame width', hint: 'in', def: 4, g: 'adv' },
+        { k: 'ft', label: 'Frame thickness', hint: 'in', def: 2.5, g: 'adv' },
+        { k: 'st', label: 'Shutter thickness', hint: 'in', def: 1.5, g: 'adv' },
+        { k: 'sw', label: 'Shutter stile width', hint: 'in', def: 4, g: 'adv' },
+        { k: 'trw', label: 'Top rail width', hint: 'in', def: 4, g: 'adv' },
+        { k: 'lrw', label: 'Lock rail width', hint: 'in', def: 8, g: 'adv' },
+        { k: 'brw', label: 'Bottom rail width', hint: 'in', def: 8, g: 'adv' },
+        { k: 'pt', label: 'Panel thickness', hint: 'in', def: 0.75, g: 'adv' }
+      ].concat(COMMON_OPT),
+      calc: function (v) {
+        var rows = [];
+        rows.push(mk('Frame stile (vertical)', 2, v.H + v.fw / 12, v.fw, v.ft));
+        rows.push(mk('Frame head (top)', 1, v.W + J, v.fw, v.ft));
+        if (v.type === 'solid') {
+          rows.push(mk('Solid shutter board', 1, v.H, v.W * 12, v.st));
+        } else if (v.type === 'panel') {
+          var inner = v.W - 2 * v.sw / 12;
+          var ph = v.H - (v.trw + v.lrw + v.brw) / 12;
+          if (inner <= 0 || ph <= 0) return { error: 'The stiles and rails are larger than the door. Reduce the shutter stile or rail widths, or increase the door size.' };
+          rows.push(mk('Shutter stile', 2, v.H, v.sw, v.st));
+          rows.push(mk('Top rail', 1, inner + J, v.trw, v.st));
+          rows.push(mk('Lock rail', 1, inner + J, v.lrw, v.st));
+          rows.push(mk('Bottom rail', 1, inner + J, v.brw, v.st));
+          rows.push(mk('Panels (infill)', 1, ph, inner * 12, v.pt));
+        }
+        var tn = { panel: 'panel shutter', solid: 'solid shutter', none: 'frame only' }[v.type];
+        return timberResult(v, scale(rows, v.qty), fmt(v.qty, 0) + ' × door, ' + fmt(v.H, 2) + ' × ' + fmt(v.W, 2) + ' ft, ' + tn, 'door');
+      },
+      notes: 'Frame stiles run to the top of the head and the head fits between them, so corners are not counted twice. For a panel shutter the panels are counted as one lumped piece. Change the sizes under Advanced sizes to match the section you use locally.'
+    },
+
+    /* ---------------- WINDOW ---------------- */
+    {
+      key: 'window', label: 'Window',
+      fields: [
+        { k: 'H', label: 'Window height', hint: 'ft', def: 4 },
+        { k: 'W', label: 'Window width', hint: 'ft', def: 4 },
+        { k: 'n', label: 'Shutter panels', sel: [['1', '1 shutter'], ['2', '2 shutters'], ['3', '3 shutters'], ['4', '4 shutters']], def: '2' },
+        { k: 'mid', label: 'Mid rail per shutter', sel: [['0', 'None'], ['1', '1 mid rail']], def: '0' },
+        { k: 'infill', label: 'Shutter infill', sel: [['glass', 'Glass (no timber)'], ['timber', 'Timber panel']], def: 'glass', full: true },
+        { k: 'qty', label: 'Number of windows', def: 1 },
+        { k: 'fw', label: 'Frame width', hint: 'in', def: 3, g: 'adv' },
+        { k: 'ft', label: 'Frame thickness', hint: 'in', def: 2, g: 'adv' },
+        { k: 'sw', label: 'Shutter stile / rail width', hint: 'in', def: 2.5, g: 'adv' },
+        { k: 'st', label: 'Shutter thickness', hint: 'in', def: 1.5, g: 'adv' },
+        { k: 'pt', label: 'Timber panel thickness', hint: 'in', def: 0.5, g: 'adv' }
+      ].concat(COMMON_OPT),
+      calc: function (v) {
+        var n = parseInt(v.n, 10), m = parseInt(v.mid, 10), rows = [];
+        var sw = v.sw / 12;
+        var cw = v.W / n;
+        var inW = cw - 2 * sw, inH = v.H - (2 + m) * sw;
+        if (inW <= 0 || inH <= 0) return { error: 'The shutter stiles and rails are larger than the window. Reduce the stile width or the number of shutters.' };
+        rows.push(mk('Frame stile (vertical)', 2, v.H + 2 * v.fw / 12, v.fw, v.ft));
+        rows.push(mk('Frame head (top)', 1, v.W + J, v.fw, v.ft));
+        rows.push(mk('Frame sill (bottom)', 1, v.W + J, v.fw, v.ft));
+        rows.push(mk('Shutter stile', 2 * n, v.H, v.sw, v.st));
+        rows.push(mk('Shutter top / bottom rail', 2 * n, inW + J, v.sw, v.st));
+        if (m > 0) rows.push(mk('Shutter mid rail', m * n, inW + J, v.sw, v.st));
+        if (v.infill === 'timber') rows.push(mk('Timber panel (infill)', n, inH, inW * 12, v.pt));
+        return timberResult(v, scale(rows, v.qty), fmt(v.qty, 0) + ' × window, ' + fmt(v.H, 2) + ' × ' + fmt(v.W, 2) + ' ft, ' + n + ' shutter' + (n > 1 ? 's' : '') + (v.infill === 'glass' ? ', glass' : ', timber panels'), 'window');
+      },
+      notes: 'Frame stiles run the full height and the head and sill fit between them. Glass, grill bars and fittings are not included. With glass infill only the timber frame of each shutter is counted.'
+    },
+
+    /* ---------------- TABLE ---------------- */
+    {
+      key: 'table', label: 'Table',
+      fields: [
+        { k: 'L', label: 'Table length', hint: 'ft', def: 4 },
+        { k: 'W', label: 'Table width', hint: 'ft', def: 2.5 },
+        { k: 'H', label: 'Table height', hint: 'ft', def: 2.5 },
+        { k: 'tt', label: 'Top thickness', hint: 'in', def: 1.5 },
+        { k: 'str', label: 'Lower stretchers', sel: [['no', 'No'], ['yes', 'Yes, 4 stretchers']], def: 'no' },
+        { k: 'qty', label: 'Number of tables', def: 1 },
+        { k: 'ls', label: 'Leg section (square)', hint: 'in', def: 2.5, g: 'adv' },
+        { k: 'aw', label: 'Apron / stretcher width', hint: 'in', def: 3, g: 'adv' },
+        { k: 'at', label: 'Apron / stretcher thickness', hint: 'in', def: 1, g: 'adv' },
+        { k: 'oh', label: 'Top overhang beyond legs', hint: 'in', def: 2, g: 'adv', zero: true }
+      ].concat(COMMON_OPT),
+      calc: function (v) {
+        var legH = v.H - v.tt / 12;
+        var lc = v.L - 2 * v.oh / 12 - 2 * v.ls / 12;
+        var wc = v.W - 2 * v.oh / 12 - 2 * v.ls / 12;
+        if (legH <= 0) return { error: 'The top is thicker than the table height. Reduce the top thickness or increase the height.' };
+        if (lc <= 0 || wc <= 0) return { error: 'The legs and overhang take up the whole table. Reduce the overhang or leg section.' };
+        var rows = [];
+        rows.push(mk('Table top', 1, v.L, v.W * 12, v.tt));
+        rows.push(mk('Leg', 4, legH, v.ls, v.ls));
+        rows.push(mk('Long apron', 2, lc + J, v.aw, v.at));
+        rows.push(mk('Short apron', 2, wc + J, v.aw, v.at));
+        if (v.str === 'yes') {
+          rows.push(mk('Long stretcher', 2, lc + J, v.aw, v.at));
+          rows.push(mk('Short stretcher', 2, wc + J, v.aw, v.at));
+        }
+        return timberResult(v, scale(rows, v.qty), fmt(v.qty, 0) + ' × table, ' + fmt(v.L, 2) + ' × ' + fmt(v.W, 2) + ' × ' + fmt(v.H, 2) + ' ft', 'table');
+      },
+      notes: 'The top is a solid timber board. Aprons run between the legs. Drawers, plywood tops, glass and polish are not included.'
+    },
+
+    /* ---------------- SHUTTERING ---------------- */
+    {
+      key: 'shuttering', label: 'Shuttering',
+      fields: [
+        { k: 'el', label: 'Element', sel: [['slab', 'Slab (roof / floor)'], ['beam', 'Beam'], ['column', 'Column']], def: 'slab', full: true },
+        { k: 'sL', label: 'Slab length', hint: 'ft', def: 20, show: ['el', 'slab'] },
+        { k: 'sW', label: 'Slab width', hint: 'ft', def: 15, show: ['el', 'slab'] },
+        { k: 'sT', label: 'Slab thickness', hint: 'in', def: 5, show: ['el', 'slab'] },
+        { k: 'sH', label: 'Prop height', hint: 'ft', def: 10, show: ['el', 'slab'] },
+        { k: 'bL', label: 'Beam length', hint: 'ft', def: 15, show: ['el', 'beam'] },
+        { k: 'bB', label: 'Beam width', hint: 'in', def: 10, show: ['el', 'beam'] },
+        { k: 'bD', label: 'Beam depth', hint: 'in', def: 18, show: ['el', 'beam'] },
+        { k: 'bH', label: 'Prop height', hint: 'ft', def: 9, show: ['el', 'beam'] },
+        { k: 'cB', label: 'Column width', hint: 'in', def: 12, show: ['el', 'column'] },
+        { k: 'cD', label: 'Column depth', hint: 'in', def: 12, show: ['el', 'column'] },
+        { k: 'cH', label: 'Column height', hint: 'ft', def: 10, show: ['el', 'column'] },
+        { k: 'qty', label: 'Number of identical elements', def: 1, full: true },
+        { k: 'js', label: 'Joist spacing (slab)', hint: 'in', def: 12, g: 'adv', show: ['el', 'slab'] },
+        { k: 'rs', label: 'Runner spacing (slab)', hint: 'ft', def: 3, g: 'adv', show: ['el', 'slab'] },
+        { k: 'ps', label: 'Prop spacing', hint: 'ft', def: 3, g: 'adv' },
+        { k: 'ys', label: 'Yoke spacing (beam, column)', hint: 'ft', def: 2, g: 'adv' },
+        { k: 'reuse', label: 'Reuses', hint: 'times the formwork is used', def: 1, g: 'opt' },
+        { k: 'waste', label: 'Wastage %', def: 10, g: 'opt', zero: true },
+        { k: 'pply', label: 'Plywood price', hint: '৳ / sheet', def: '', ph: 'e.g. 3200', g: 'opt', blank: true },
+        { k: 'price', label: 'Timber price', hint: '৳ / cft', def: '', ph: 'e.g. 4500', g: 'opt', blank: true }
+      ],
+      calc: function (v) {
+        var area, rows = [], desc;
+        if (v.el === 'slab') {
+          var L = v.sL, W = v.sW;
+          area = L * W + 2 * (L + W) * v.sT / 12;
+          rows.push(mk('Joist', (fl(W * 12 / v.js) + 1), L, 3, 2));
+          rows.push(mk('Runner', (fl(L / v.rs) + 1), W, 4, 3));
+          rows.push(mk('Prop', (fl(L / v.ps) + 1) * (fl(W / v.ps) + 1), v.sH, 3, 3));
+          desc = 'slab ' + fmt(L, 2) + ' × ' + fmt(W, 2) + ' ft, ' + fmt(v.sT, 1) + ' in thick';
+        } else if (v.el === 'beam') {
+          area = v.bL * (v.bB + 2 * v.bD) / 12;
+          rows.push(mk('Beam yoke (U-frame)', fl(v.bL / v.ys) + 1, (v.bB + 2 * v.bD + 8) / 12, 3, 2));
+          rows.push(mk('Prop', fl(v.bL / v.ps) + 1, v.bH, 3, 3));
+          desc = 'beam ' + fmt(v.bL, 2) + ' ft, ' + fmt(v.bB, 1) + ' × ' + fmt(v.bD, 1) + ' in';
+        } else {
+          area = 2 * (v.cB + v.cD) / 12 * v.cH;
+          var st = fl(v.cH / v.ys) + 1;
+          rows.push(mk('Vertical batten', 2 * (fl(v.cB / 12) + 1) + 2 * (fl(v.cD / 12) + 1), v.cH, 3, 2));
+          rows.push(mk('Yoke (width side)', 2 * st, (v.cB + 8) / 12, 3, 2));
+          rows.push(mk('Yoke (depth side)', 2 * st, (v.cD + 8) / 12, 3, 2));
+          desc = 'column ' + fmt(v.cB, 1) + ' × ' + fmt(v.cD, 1) + ' in, ' + fmt(v.cH, 2) + ' ft high';
+        }
+        var q = v.qty, reuse = v.reuse > 0 ? v.reuse : 1;
+        var totArea = area * q;
+        var netSheets = totArea / 32;
+        var sheets = netSheets * (1 + v.waste / 100) / reuse;
+        var buy = Math.ceil(sheets - 1e-9);
+        var trows = scale(rows, q);
+        var net = sum(trows);
+        var gross = net * (1 + v.waste / 100) / reuse;
+        var props = 0;
+        trows.forEach(function (r) { if (r.name === 'Prop') props += r.pcs; });
+        var tiles = [
+          { k: 'Contact area', v: fmt(totArea * 0.092903, 2) + ' m²' },
+          { k: 'Plywood sheets (8 × 4 ft)', v: fmt(buy, 0) + ' to buy' },
+          { k: 'Timber supports', v: fmt(gross, 2) + ' cft' },
+          { k: 'Props', v: fmt(props, 0) + ' pcs' }
+        ];
+        var cost = (v.pply > 0 ? buy * v.pply : 0) + (v.price > 0 ? gross * v.price : 0);
+        if (v.pply > 0 || v.price > 0) tiles.push({ k: 'Estimated cost', v: '৳ ' + fmt(cost, 0) });
+        var ply = {
+          title: 'Plywood (formwork face)',
+          head: ['Item', 'Value'],
+          rows: [
+            ['Contact area, one element', fmt(area, 2) + ' sq ft'],
+            ['Contact area, all elements', fmt(totArea, 2) + ' sq ft'],
+            ['One sheet 8 × 4 ft', '32 sq ft'],
+            ['Sheets needed (net)', fmt(netSheets, 2)],
+            ['With ' + fmt(v.waste, 0) + '% wastage' + (reuse > 1 ? ' and ' + fmt(reuse, 0) + ' reuses' : ''), fmt(sheets, 2)]
+          ],
+          foot: ['Sheets to buy', fmt(buy, 0)]
+        };
+        var tim = cutTable('Timber supports (net, one use, before wastage)', trows, net);
+        return {
+          hero: { k: 'Shuttering contact area', v: fmt(totArea, 1), u: 'sq ft', eq: fmt(q, 0) + ' × ' + desc },
+          tiles: tiles,
+          tables: [ply, tim]
+        };
+      },
+      notes: 'Contact area is the surface the formwork touches: soffit and edges for a slab, bottom and both sides for a beam, all four faces for a column. Supports use fixed sections: joists 3 × 2 in, runners 4 × 3 in, props 3 × 3 in, yokes and battens 3 × 2 in. Plywood and timber quantities are divided by the number of reuses. This is a quantity estimate, not a formwork design, so props, spacing and bracing must be checked by the site engineer.'
+    }
+  ];
+
+  /* ---------- build UI ---------- */
+  var tabsEl = $('tabs'), panesEl = $('panes');
+
+  function fieldHtml(tab, f) {
+    var id = tab.key + '-' + f.k, inner;
+    if (f.sel) {
+      inner = '<select id="' + id + '">' + f.sel.map(function (o) {
+        return '<option value="' + o[0] + '"' + (o[0] === f.def ? ' selected' : '') + '>' + o[1] + '</option>';
+      }).join('') + '</select>';
+    } else {
+      inner = '<input id="' + id + '" type="text" inputmode="decimal" value="' + (f.def === undefined ? '' : f.def) + '"' +
+        (f.ph ? ' placeholder="' + f.ph + '"' : '') + ' autocomplete="off">';
+    }
+    return '<div class="field' + (f.full ? ' full' : '') + '" id="w-' + id + '"><label for="' + id + '">' + f.label +
+      (f.hint ? ' <span class="hint">' + f.hint + '</span>' : '') + '</label>' + inner + '</div>';
+  }
+
+  TABS.forEach(function (tab, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'tab'; b.id = 'tab-' + tab.key; b.setAttribute('role', 'tab');
+    b.setAttribute('aria-controls', 'pane-' + tab.key); b.textContent = tab.label;
+    b.addEventListener('click', function () { select(tab.key, true); });
+    tabsEl.appendChild(b);
+
+    var main = '', adv = '', opt = '';
+    tab.fields.forEach(function (f) {
+      var h = fieldHtml(tab, f);
+      if (f.g === 'adv') adv += h; else if (f.g === 'opt') opt += h; else main += h;
+    });
+    var pane = document.createElement('div');
+    pane.id = 'pane-' + tab.key; pane.setAttribute('role', 'tabpanel'); pane.setAttribute('aria-labelledby', 'tab-' + tab.key);
+    pane.innerHTML =
+      '<div class="grid">' +
+        '<section class="panel"><h2>' + tab.label + ' inputs</h2>' +
+          '<div class="pair">' + main + '</div>' +
+          (adv ? '<details class="adv"><summary>Advanced sizes</summary><div class="pair">' + adv + '</div></details>' : '') +
+          '<div class="opt"><p class="opt-t">Optional</p><div class="pair">' + opt + '</div></div>' +
+        '</section>' +
+        '<section class="panel" aria-live="polite"><h2>' + tab.label + ' result</h2><div id="' + tab.key + '-out"></div></section>' +
+      '</div>';
+    panesEl.appendChild(pane);
+
+    tab.fields.forEach(function (f) {
+      var el = $(tab.key + '-' + f.k);
+      el.addEventListener('input', function () { run(tab); });
+      el.addEventListener('change', function () { run(tab); });
+    });
+  });
+
+  /* ---------- run ---------- */
+  function run(tab) {
+    var out = $(tab.key + '-out');
+    var v = {}, problem = null;
+    tab.fields.forEach(function (f) {
+      var id = tab.key + '-' + f.k, wrap = $('w-' + id), el = $(id);
+      var visible = true;
+      if (f.show) visible = $(tab.key + '-' + f.show[0]).value === f.show[1];
+      wrap.hidden = !visible;
+      if (!visible) return;
+      if (f.sel) { v[f.k] = el.value; return; }
+      var raw = en(el.value);
+      if (raw === '') {
+        if (f.blank) { v[f.k] = 0; return; }
+        if (!problem) problem = 'Enter a value for "' + f.label + '".';
+        return;
+      }
+      var n = parseFloat(raw);
+      if (isNaN(n)) { if (!problem) problem = 'Enter a valid number for "' + f.label + '".'; return; }
+      if (f.zero || f.blank) { if (n < 0 && !problem) problem = '"' + f.label + '" cannot be negative.'; }
+      else if (n <= 0 && !problem) problem = '"' + f.label + '" must be above 0.';
+      v[f.k] = n;
+    });
+    if (problem) { out.innerHTML = '<div class="err">' + problem + '</div>'; return; }
+    var res = tab.calc(v);
+    if (res.error) { out.innerHTML = '<div class="err">' + res.error + '</div>'; return; }
+
+    var h = '<div class="hero"><span class="k">' + res.hero.k + '</span><span class="v">' + res.hero.v +
+      '<small>' + res.hero.u + '</small></span><span class="eq">' + res.hero.eq + '</span></div>';
+    h += '<div class="tiles">' + res.tiles.map(function (t) {
+      return '<div class="tile"><div class="tk">' + t.k + '</div><div class="tv">' + t.v + '</div></div>';
+    }).join('') + '</div>';
+    res.tables.forEach(function (t) {
+      h += '<p class="tt">' + t.title + '</p><div class="tbl"><table><thead><tr>' +
+        t.head.map(function (c) { return '<th>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' +
+        t.rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') +
+        '</tbody><tfoot><tr>' + t.foot.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr></tfoot></table></div>';
+    });
+    h += '<p class="note">' + tab.notes + '</p>';
+    out.innerHTML = h;
+  }
+
+  /* ---------- tabs and hash ---------- */
+  function select(key, setHash) {
+    TABS.forEach(function (t) {
+      var on = t.key === key;
+      $('tab-' + t.key).setAttribute('aria-selected', on ? 'true' : 'false');
+      $('pane-' + t.key).hidden = !on;
+    });
+    if (setHash) {
+      try { if (location.hash !== '#' + key) location.hash = key; } catch (e) {}
+    }
+  }
+  function fromHash() {
+    var k = '';
+    try { k = (location.hash || '').replace('#', ''); } catch (e) {}
+    var ok = TABS.some(function (t) { return t.key === k; });
+    select(ok ? k : TABS[0].key, false);
+  }
+  window.addEventListener('hashchange', fromHash);
+
+  TABS.forEach(run);
+  fromHash();
+})();
+</script>
+
+</body></html>

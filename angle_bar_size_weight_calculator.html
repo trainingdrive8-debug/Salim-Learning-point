@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Angle Bar Weight Calculator — Salim Construction</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:#172334;font-family:Arial,"Noto Sans Bengali",sans-serif;line-height:1.55}.wrap{max-width:980px;margin:22px auto;padding:14px}.panel{background:#fff;padding:20px;border-radius:14px;margin-bottom:16px;box-shadow:0 4px 18px #10233b12}h1,h2{color:#15549a;margin:0 0 12px}h1{font-size:25px}h2{font-size:20px}.note{background:#fff7e6;border-left:4px solid #e3a126;padding:12px;border-radius:7px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:13px}label{font-weight:bold;font-size:14px;display:block;margin-bottom:5px}input,select{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px;background:#fff}button{border:0;border-radius:8px;padding:12px 18px;background:#15549a;color:#fff;font-size:16px;font-weight:bold;margin:12px 8px 0 0;cursor:pointer}.secondary{background:#475569}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px}.metric{background:#eef5ff;padding:13px;border-radius:9px}.metric small{display:block;color:#52657d}.metric strong{font-size:21px;color:#12477f}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #d8e0ea;padding:9px;text-align:left}th{background:#edf3fb}.muted{font-size:13px;color:#596779}.hide{display:none}@media print{body{background:white}.wrap{margin:0}.panel{box-shadow:none;border:1px solid #ddd}button{display:none}}
+</style></head><body><div class="wrap">
+<section class="panel">
+<h1>📐 অ্যাঙ্গেল বার (Angle Bar) হিসাব ক্যালকুলেটর</h1>
+<p>Angle bar-এর সাইজ, পুরুত্ব, দৈর্ঘ্য ও পিসের সংখ্যা দিলে মোট ওজন, ওয়েস্টেজ এবং ২০/৩০/৪০ ফুট স্টিকের আনুমানিক সংখ্যা বের করুন।</p>
+<div class="note"><b>হিসাবের ভিত্তি:</b> স্টিলের ঘনত্ব ৭৮৫০ kg/m³ ধরে আনুমানিক তাত্ত্বিক ওজন। বাস্তব অ্যাঙ্গেল বারের রোলড কর্নার/ফিলেট, প্রকৃত পুরুত্ব ও প্রস্তুতকারকের টলারেন্সের কারণে ওজন কিছুটা আলাদা হতে পারে। কেনার আগে সরবরাহকারীর kg/m বা ওজন চার্ট মিলিয়ে নিন।</div>
+<div class="grid">
+<div><label>অ্যাঙ্গেল বারের ধরন</label><select id="type"><option value="equal">Equal Angle (দুই পাশ সমান)</option><option value="unequal">Unequal Angle (দুই পাশ অসমান)</option></select></div>
+<div><label>এক পাশ A (মিমি)</label><select id="preset"><option value="25,25,3">25 × 25 × 3 mm</option><option value="30,30,3">30 × 30 × 3 mm</option><option value="40,40,4">40 × 40 × 4 mm</option><option value="50,50,5" selected>50 × 50 × 5 mm</option><option value="50,50,6">50 × 50 × 6 mm</option><option value="65,65,6">65 × 65 × 6 mm</option><option value="75,75,6">75 × 75 × 6 mm</option><option value="75,75,8">75 × 75 × 8 mm</option><option value="100,100,8">100 × 100 × 8 mm</option><option value="custom">নিজে লিখুন</option></select></div>
+<div><label>পাশ A (মিমি)</label><input id="aCustom" type="number" min="1" step=".1" value="50"></div>
+<div><label>পাশ B (মিমি)</label><input id="b" type="number" min="1" step=".1" value="50"></div>
+<div><label>পুরুত্ব T (মিমি)</label><input id="t" type="number" min=".1" step=".1" value="5"></div>
+<div><label>প্রতি পিসের দৈর্ঘ্য (ফুট)</label><input id="length" type="number" min=".1" step=".1" value="20"></div>
+<div><label>মোট পিস সংখ্যা</label><input id="qty" type="number" min="1" step="1" value="10"></div>
+<div><label>ওয়েস্টেজ (%)</label><input id="waste" type="number" min="0" step=".5" value="5"></div>
+<div><label>বাজারের স্টিক দৈর্ঘ্য (ফুট)</label><select id="stock"><option value="20">২০ ফুট</option><option value="30">৩০ ফুট</option><option value="40">৪০ ফুট</option><option value="custom">নিজে লিখুন</option></select><input id="stockCustom" class="hide" type="number" min=".1" step=".1" placeholder="স্টিক দৈর্ঘ্য ফুটে"></div>
+</div>
+<button onclick="calculate()">হিসাব করুন</button><button class="secondary" onclick="window.print()">প্রিন্ট / PDF</button>
+</section>
+<section class="panel">
+<h2>📊 হিসাবের ফলাফল</h2>
+<div class="cards">
+<div class="metric"><small>প্রতি মিটারে ওজন</small><strong id="kgm">—</strong><small>কেজি / মিটার</small></div>
+<div class="metric"><small>প্রতি ফুটে ওজন</small><strong id="kgft">—</strong><small>কেজি / ফুট</small></div>
+<div class="metric"><small>মোট দৈর্ঘ্য</small><strong id="totalLen">—</strong><small>ফুট</small></div>
+<div class="metric"><small>ওয়েস্টেজসহ মোট ওজন</small><strong id="totalKg">—</strong><small>কেজি</small></div>
+<div class="metric"><small>আনুমানিক বাজারের স্টিক</small><strong id="sticks">—</strong><small>টি</small></div>
+<div class="metric"><small>একটি পিসের ওজন</small><strong id="pieceKg">—</strong><small>কেজি</small></div>
+</div>
+<table><thead><tr><th>বিবরণ</th><th>হিসাব</th></tr></thead><tbody id="details"></tbody></table>
+<div class="note"><b>নোট:</b> বাজারের স্টিক সংখ্যা হিসাবটি মোট প্রয়োজনীয় রানিং ফুট ÷ স্টিক দৈর্ঘ্য করে রাউন্ড আপ করা হয়েছে। কাটিং অপচয়, জয়েন্ট/জোড়া ও কাটিং প্ল্যানের কারণে বাস্তবে বেশি স্টিক লাগতে পারে।</div>
+</section>
+<section class="panel muted">
+<b>ওজন বের করার সূত্র (আনুমানিক):</b>
+<p>Cross-sectional area = T × (A + B − T) mm²</p>
+<p>ওজন (kg/m) = Area × 0.00785</p>
+<p>মোট ওজন = kg/m × মোট দৈর্ঘ্য (মিটার)</p>
+<p>Equal angle হলে A = B। Unequal angle হলে A ও B আলাদা মাপ দিন। এই সূত্রটি সরল আয়তাকার অংশ ধরে আনুমানিক হিসাব; রোলড প্রোফাইলের ফিলেট/রেডিয়াস এতে ধরা হয়নি।</p>
+</section></div>
+<script>
+const $=id=>document.getElementById(id),v=id=>Number($(id).value),fmt=(x,d=2)=>Number(x).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+$('preset').addEventListener('change',()=>{if($('preset').value!=='custom'){let [a,b,t]=$('preset').value.split(',').map(Number);$('b').value=b;$('t').value=t;}});
+
+$('stock').addEventListener('change',()=>$('stockCustom').classList.toggle('hide',$('stock').value!=='custom'));
+function calculate(){
+ let A=$('preset').value==='custom'?v('aCustom'):Number($('preset').value.split(',')[0]);
+ let B=v('b'),T=v('t'),L=v('length'),Q=v('qty'),w=v('waste'),stock=$('stock').value==='custom'?v('stockCustom'):v('stock');
+ if(![A,B,T,L,Q,stock].every(x=>x>0)||w<0||T>=Math.min(A,B)){alert('সঠিক মাপ দিন। পুরুত্ব পাশের মাপের চেয়ে কম হতে হবে।');return}
+ if($('type').value==='equal') B=A;
+ let area=T*(A+B-T),kgm=area*.00785,kgft=kgm*.3048;
+ let totalFt=L*Q,totalM=totalFt*.3048,baseKg=totalM*kgm,totalKg=baseKg*(1+w/100);
+ let pieceKg=L*.3048*kgm,sticks=Math.ceil(totalFt*(1+w/100)/stock);
+ $('kgm').textContent=fmt(kgm);$('kgft').textContent=fmt(kgft);$('totalLen').textContent=fmt(totalFt);$('totalKg').textContent=fmt(totalKg);$('sticks').textContent=sticks;$('pieceKg').textContent=fmt(pieceKg);
+ let rows=[
+ ['অ্যাঙ্গেল বারের সাইজ',`${A} × ${B} × ${T} mm`],
+ ['ক্রস-সেকশনাল এরিয়া',`${fmt(area)} mm²`],
+ ['প্রতি মিটারে তাত্ত্বিক ওজন',`${fmt(kgm)} kg/m`],
+ ['প্রতি ফুটে তাত্ত্বিক ওজন',`${fmt(kgft)} kg/ft`],
+ ['এক পিসের দৈর্ঘ্য',`${fmt(L)} ফুট`],
+ ['এক পিসের ওজন',`${fmt(pieceKg)} কেজি`],
+ ['মোট পিস',`${Q} টি`],
+ ['মোট দৈর্ঘ্য',`${fmt(totalFt)} ফুট = ${fmt(totalM)} মিটার`],
+ ['ওয়েস্টেজ ছাড়া মোট ওজন',`${fmt(baseKg)} কেজি`],
+ [`ওয়েস্টেজ (${fmt(w,1)}%)`,`${fmt(totalKg-baseKg)} কেজি`],
+ ['ওয়েস্টেজসহ মোট ওজন',`${fmt(totalKg)} কেজি`],
+ ['স্টিক দৈর্ঘ্য',`${fmt(stock)} ফুট`],
+ ['আনুমানিক বাজারের স্টিক',`${sticks} টি`]
+ ];
+ $('details').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
+}
+calculate();
+</script></body></html>

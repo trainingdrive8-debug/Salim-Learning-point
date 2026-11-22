@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>রাস্তার HBB ও BFS ব্রিক সলিং হিসাব</title>
+<style>
+:root{--blue:#1456a0;--light:#eef5ff;--ink:#172334}
+*{box-sizing:border-box}body{margin:0;background:#f4f6f9;color:var(--ink);font-family:Arial,"Noto Sans Bengali",sans-serif;line-height:1.55}
+.wrap{max-width:980px;margin:24px auto;padding:16px}.panel{background:white;border-radius:14px;padding:22px;box-shadow:0 5px 22px #17233412;margin-bottom:16px}
+h1{font-size:25px;margin:0 0 8px;color:var(--blue)}h2{font-size:19px;margin:0 0 14px;color:var(--blue)}
+.note{background:#fff8e7;border-left:4px solid #e4a11b;padding:12px;border-radius:7px;margin:14px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+label{display:block;font-weight:600;font-size:14px;margin-bottom:5px}
+input,select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px;background:white}
+button{background:var(--blue);color:white;border:0;border-radius:9px;padding:12px 20px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:16px}
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.metric{background:var(--light);padding:14px;border-radius:10px}.metric small{display:block;color:#52657d}.metric strong{font-size:22px;color:#103f79}
+table{width:100%;border-collapse:collapse;margin-top:12px}th,td{padding:10px;border:1px solid #d8e0ea;text-align:left}th{background:#edf3fb}
+.footer{font-size:13px;color:#596779}.hide{display:none}
+@media print{body{background:white}.wrap{margin:0;max-width:none}.panel{box-shadow:none;border:1px solid #ddd}button{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="panel">
+<h1>🧱 রাস্তার ব্রিক সলিং হিসাব — HBB ও BFS</h1>
+<p>রাস্তার দৈর্ঘ্য, প্রস্থ ও কাজের ধরন দিয়ে ইট, ভরাট বালি, ওয়েস্টেজ এবং ক্রস-স্লোপের হিসাব করুন।</p>
+<div class="note"><b>হিসাবের ভিত্তি (পরিবর্তনযোগ্য):</b> ইট ৯.৫″ × ৪.৫″ × ২.৭৫″, জয়েন্ট ¼″, HBB-তে ইটের দৃশ্যমান মুখ ৯.৫″ × ২.৭৫″ (এজে), BFS-তে ৯.৫″ × ৪.৫″ (ফ্ল্যাটে), বালির স্তর ২″, ইটের ওয়েস্টেজ ৫% এবং স্লোপ ১:৪০ ধরা হয়েছে। স্থানীয় ইটের মাপ ও নকশা অনুযায়ী প্রকৃত পরিমাণ কিছুটা বদলাবে।</div>
+<div class="grid">
+<div><label for="length">রাস্তার দৈর্ঘ্য (ফুট)</label><input id="length" type="number" min="0" step="0.1" value="100"></div>
+<div><label for="width">রাস্তার প্রস্থ (ফুট)</label><select id="width"><option value="5">৫ ফুট</option><option value="10" selected>১০ ফুট</option><option value="custom">নিজে লিখুন</option></select><input id="customWidth" class="hide" type="number" min="0" step="0.1" placeholder="প্রস্থ ফুটে"></div>
+<div><label for="type">সলিংয়ের ধরন</label><select id="type"><option value="HBB">HBB — ইট এজে / হেরিংবোন</option><option value="BFS">BFS — ইট ফ্ল্যাটে</option></select></div>
+<div><label for="sand">ভরাট বালির পুরুত্ব (ইঞ্চি)</label><input id="sand" type="number" min="0" step="0.25" value="2"></div>
+<div><label for="waste">ইটের ওয়েস্টেজ (%)</label><input id="waste" type="number" min="0" step="0.5" value="5"></div>
+<div><label for="slope">স্লোপের অনুপাত (১ : কত)</label><input id="slope" type="number" min="1" step="1" value="40"></div>
+<div><label for="joint">ইটের জয়েন্ট (ইঞ্চি)</label><input id="joint" type="number" min="0" step="0.05" value="0.25"></div>
+</div>
+<button onclick="calculate()">হিসাব করুন</button>
+<button onclick="window.print()" style="background:#475569">প্রিন্ট / PDF</button>
+</section>
+<section class="panel">
+<h2>📊 হিসাবের ফলাফল</h2>
+<div class="results">
+<div class="metric"><small>মোট রাস্তার ক্ষেত্রফল</small><strong id="area">—</strong><small>বর্গফুট</small></div>
+<div class="metric"><small>প্রয়োজনীয় ইট (ওয়েস্টেজসহ)</small><strong id="bricks">—</strong><small>টি</small></div>
+<div class="metric"><small>বালির পরিমাণ</small><strong id="sandCft">—</strong><small>ঘনফুট (CFT)</small></div>
+<div class="metric"><small>বালির পরিমাণ</small><strong id="sandCyd">—</strong><small>ঘনগজ (Cubic Yard)</small></div>
+<div class="metric"><small>স্লোপে মোট উচ্চতার পার্থক্য</small><strong id="drop">—</strong><small>ইঞ্চি (এক পাশ থেকে অন্য পাশে)</small></div>
+<div class="metric"><small>ক্রাউন থেকে এক পাশের ড্রপ</small><strong id="halfDrop">—</strong><small>ইঞ্চি (মাঝখান উঁচু হলে)</small></div>
+</div>
+<table>
+<thead><tr><th>বিবরণ</th><th>পরিমাণ / সূত্র</th></tr></thead>
+<tbody id="details"></tbody>
+</table>
+<div class="note"><b>স্লোপ বোঝার নিয়ম:</b> মাঝখানে উঁচু (ক্যাম্বার) করে দুই পাশে পানি নামালে ১:৪০ স্লোপে ৫ ফুট রাস্তার অর্ধ-প্রস্থ ২.৫ ফুটে ড্রপ ≈ ০.৭৫″; ১০ ফুট রাস্তার অর্ধ-প্রস্থ ৫ ফুটে ড্রপ ≈ ১.৫০″। এক পাশ থেকে অন্য পাশে একমুখী ঢাল হলে মোট প্রস্থ ধরে ড্রপ হবে যথাক্রমে ≈ ১.৫০″ ও ৩.০০″।</div>
+</section>
+<section class="panel footer">
+<b>গুরুত্বপূর্ণ:</b> এই হিসাব প্রাথমিক আনুমানিক পরিমাণ। HBB-এর হেরিংবোন প্যাটার্ন, রাস্তার প্রান্তে কাটিং, বেডের সমতলকরণ, সাব-বেস/খোয়া, কম্প্যাকশন এবং প্রকৃত ইটের মাপ অনুযায়ী সাইটে পরিমাপ করে চূড়ান্ত BOQ করতে হবে। বালির হিসাবটি শুধু ইনপুট দেওয়া পুরুত্বের সমান সমতল বেডের জন্য; ঢাল বা অনিয়মিত সাবগ্রেড থাকলে পরিমাণ বাড়তে পারে।
+</section>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+$('width').addEventListener('change',()=>{$('customWidth').classList.toggle('hide',$('width').value!=='custom');calculate()});
+function fmt(n,d=2){return Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function calculate(){
+ const L=+$('length').value, W=$('width').value==='custom'?+$('customWidth').value:+$('width').value;
+ const sandIn=+$('sand').value, waste=+$('waste').value, slope=+$('slope').value, joint=+$('joint').value;
+ if(!(L>0&&W>0&&sandIn>=0&&waste>=0&&slope>0&&joint>=0)){alert('সঠিক ধনাত্মক মান লিখুন।');return}
+ const area=L*W, isHBB=$('type').value==='HBB';
+ const faceW=9.5+joint, faceH=(isHBB?2.75:4.5)+joint;
+ const perSqft=144/(faceW*faceH);
+ const base=area*perSqft, total=Math.ceil(base*(1+waste/100));
+ const sand=area*(sandIn/12), cft=sand, cyd=sand/27;
+ const halfDrop=(W/2*12)/slope, fullDrop=(W*12)/slope;
+ $('area').textContent=fmt(area,2);$('bricks').textContent=total.toLocaleString('en-US');
+ $('sandCft').textContent=fmt(cft,2);$('sandCyd').textContent=fmt(cyd,3);
+ $('drop').textContent=fmt(fullDrop,2);$('halfDrop').textContent=fmt(halfDrop,2);
+ const rows=[
+ ['রাস্তার মাপ',`${fmt(L,2)} ft × ${fmt(W,2)} ft`],
+ ['সলিংয়ের ধরন',$('type').value==='HBB'?'HBB — ইট এজে':'BFS — ইট ফ্ল্যাটে'],
+ ['প্রতি বর্গফুটে আনুমানিক ইট',`${fmt(perSqft,2)} টি`],
+ ['ওয়েস্টেজের আগে ইট',`${Math.ceil(base).toLocaleString('en-US')} টি`],
+ [`ওয়েস্টেজ (${fmt(waste,1)}%)`,`${Math.ceil(base*waste/100).toLocaleString('en-US')} টি`],
+ ['মোট ইট (ওয়েস্টেজসহ)',`${total.toLocaleString('en-US')} টি`],
+ ['বালির বেড',`${fmt(sandIn,2)}″ পুরু`],
+ ['বালির পরিমাণ (কম্প্যাকশন/অতিরিক্ত বাদে)',`${fmt(cft,2)} CFT = ${fmt(cyd,3)} cubic yard`],
+ ['১: '+slope+' স্লোপে মাঝখান থেকে পাশে ড্রপ',`${fmt(halfDrop,2)}″`],
+ ['১: '+slope+' স্লোপে এক পাশ থেকে অন্য পাশে ড্রপ',`${fmt(fullDrop,2)}″`]
+ ];
+ $('details').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
+}
+calculate();
+</script>
+</body>
+</html>

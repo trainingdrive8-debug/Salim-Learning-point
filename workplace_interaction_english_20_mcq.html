@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workplace Interaction in English - 20 MCQ</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans Bengali",Arial,sans-serif;background:#f2f6fb;color:#1f2937}
+.wrap{max-width:850px;margin:35px auto;padding:18px}.quiz{background:#fff;border-radius:16px;padding:28px;box-shadow:0 8px 28px #14213d18}
+h1{text-align:center;color:#123b68;font-size:25px;margin:0 0 8px}.sub{text-align:center;color:#64748b;margin:0 0 24px}
+.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#475569;font-weight:600;margin-bottom:12px}
+.bar{height:9px;background:#e5eaf1;border-radius:20px;overflow:hidden;margin-bottom:24px}.fill{height:100%;width:0;background:#16845b;transition:.2s}
+.q{font-size:20px;font-weight:700;line-height:1.6;margin:10px 0 20px}.option{display:block;width:100%;text-align:left;padding:13px 15px;margin:10px 0;border:1px solid #d5deea;border-radius:10px;background:#fff;font-size:16px;cursor:pointer;color:#263445}
+.option:hover:not(:disabled){background:#f0f7ff;border-color:#4285c5}.option:disabled{cursor:default}.option.correct{background:#e4f7eb;border-color:#249653;color:#146c37}.option.wrong{background:#fff0f0;border-color:#d94b4b;color:#a32020}
+.feedback{min-height:48px;padding:12px;border-radius:9px;margin-top:14px;line-height:1.5;background:#f3f6fa;color:#334155}
+.controls{display:flex;justify-content:space-between;gap:10px;margin-top:22px;flex-wrap:wrap}
+button.nav{border:0;border-radius:9px;padding:12px 22px;font-size:16px;cursor:pointer;background:#164e83;color:white}button.nav:disabled{opacity:.4;cursor:not-allowed}button.reset{background:#64748b}
+.result{text-align:center;padding:25px}.score{font-size:30px;color:#147346;font-weight:800}
+@media(max-width:600px){.wrap{margin:10px auto;padding:10px}.quiz{padding:18px}.q{font-size:18px}h1{font-size:21px}}
+</style>
+</head>
+<body><div class="wrap"><main class="quiz">
+<h1>Carryout Workplace Interaction in English</h1>
+<p class="sub">২০টি বহুনির্বাচনী প্রশ্ন (MCQ)</p>
+<div id="quizArea">
+<div class="top"><span id="count">প্রশ্ন ১ / ২০</span><span id="answered">উত্তর দেওয়া হয়েছে: ০</span></div>
+<div class="bar"><div class="fill" id="progress"></div></div>
+<div class="q" id="question"></div><div id="options"></div>
+<div class="feedback" id="feedback">সঠিক উত্তর নির্বাচন করুন।</div>
+<div class="controls"><button class="nav" id="prev" onclick="move(-1)">আগের প্রশ্ন</button><button class="nav" id="next" onclick="move(1)">পরের প্রশ্ন</button></div>
+</div><div id="result" class="result" hidden></div>
+<div class="controls"><button class="nav reset" onclick="restart()">আবার শুরু করুন</button><button class="nav" onclick="window.print()">প্রিন্ট করুন</button></div>
+</main></div>
+<script>
+const questions = [["What is the meaning of “Good morning”?", ["শুভ সকাল", "শুভ রাত্রি", "বিদায়", "ধন্যবাদ"], 0, "“Good morning” সকালে কাউকে অভিবাদন জানানোর জন্য ব্যবহৃত হয়।"], ["How do you introduce yourself in English?", ["What is your name?", "My name is Rahim.", "How are you?", "See you later."], 1, "নিজের পরিচয় দিতে “My name is …” বলা হয়।"], ["Which sentence is used to ask someone’s name politely?", ["Give me your name.", "Who are you?", "May I know your name, please?", "Tell name."], 2, "ভদ্রভাবে নাম জানতে “May I know your name, please?” বলা যায়।"], ["What is the appropriate response to “How are you?”", ["I am fine, thank you.", "Good night.", "You are welcome.", "My name is Karim."], 0, "“How are you?”-এর উত্তরে “I am fine, thank you.” বলা যায়।"], ["Which expression is used to ask for help politely?", ["Help me now.", "Could you please help me?", "You must help.", "Do it."], 1, "সহায়তা চাইতে “Could you please help me?” ভদ্র ও উপযুক্ত।"], ["What should you say when you do not understand an instruction?", ["I don't care.", "Repeat it loudly.", "Could you please explain that again?", "No."], 2, "নির্দেশনা বুঝতে না পারলে আবার ব্যাখ্যা করতে অনুরোধ করতে হয়।"], ["Which phrase is suitable when answering a workplace phone call?", ["Hello, this is the workshop. How may I help you?", "Who is this?", "Speak fast.", "Call later."], 0, "কর্মক্ষেত্রে ফোন ধরার সময় পরিচয় দিয়ে ভদ্রভাবে সাহায্যের কথা জানতে হয়।"], ["What does “Thank you” express?", ["রাগ", "কৃতজ্ঞতা", "দুঃখ", "অনুমতি"], 1, "“Thank you” কৃতজ্ঞতা প্রকাশ করে।"], ["What is the correct response to “Thank you”?", ["Sorry", "Goodbye", "You’re welcome.", "Excuse me."], 2, "“Thank you”-এর প্রচলিত উত্তর “You’re welcome.”"], ["Which sentence is used to apologize?", ["I am sorry.", "I am ready.", "I agree.", "Good job."], 0, "ভুল বা অসুবিধার জন্য দুঃখ প্রকাশ করতে “I am sorry.” বলা হয়।"], ["What does “Please” indicate in a request?", ["আদেশ", "ভদ্রতা", "অস্বীকৃতি", "অভিযোগ"], 1, "অনুরোধকে ভদ্র করতে “Please” ব্যবহার করা হয়।"], ["Which is an appropriate way to disagree politely?", ["You are wrong.", "That is stupid.", "I understand your point, but I think differently.", "Be quiet."], 2, "মতভেদ হলে অন্যের মতকে সম্মান জানিয়ে নিজের মত বলা উচিত।"], ["What should you do while a colleague is speaking?", ["Interrupt continuously", "Listen carefully", "Look away and ignore", "Talk to someone else"], 1, "সহকর্মী কথা বলার সময় মনোযোগ দিয়ে শোনা কার্যকর যোগাযোগের অংশ।"], ["Which question asks for clarification of a task deadline?", ["Why so late?", "When should I finish this task?", "Do it yourself.", "Is it difficult?"], 1, "কাজ শেষ করার সময় জানতে “When should I finish this task?” বলা হয়।"], ["What does “Could you speak more slowly, please?” mean?", ["দয়া করে একটু ধীরে কথা বলবেন?", "দয়া করে চলে যান।", "আমি কথা বলব না।", "আপনি কি লিখতে পারেন?"], 0, "কথা বুঝতে অসুবিধা হলে ধীরে বলার অনুরোধ করা যায়।"], ["Which sentence is suitable for giving a work update?", ["I have completed the task.", "I don't know you.", "Where are you going?", "Never mind."], 0, "কাজের অগ্রগতি জানাতে “I have completed the task.” বলা যায়।"], ["What should you say before leaving the workplace at the end of the day?", ["Good morning", "Good afternoon", "Goodbye, see you tomorrow.", "Welcome"], 2, "দিন শেষে বিদায় জানাতে “Goodbye, see you tomorrow.” উপযুক্ত।"], ["Which expression is used to get someone's attention politely?", ["Hey, you!", "Excuse me.", "Move!", "Listen now!"], 1, "কারও দৃষ্টি আকর্ষণ করতে “Excuse me” ভদ্র অভিব্যক্তি।"], ["What is the main purpose of workplace communication?", ["To create confusion", "To share information and coordinate work", "To waste time", "To avoid teamwork"], 1, "কর্মক্ষেত্রে তথ্য আদান-প্রদান ও কাজের সমন্বয় করাই যোগাযোগের প্রধান উদ্দেশ্য।"], ["Which is a good practice in professional email writing?", ["Use a clear subject and polite language", "Write everything in capital letters", "Use rude words", "Leave the message unclear"], 0, "পেশাগত ইমেইলে স্পষ্ট বিষয় (subject) ও ভদ্র ভাষা ব্যবহার করা উচিত।"]];
+let current=0, answers={};
+function render(){
+ const q=questions[current]; document.getElementById('count').textContent=`প্রশ্ন ${current+1} / ${questions.length}`;
+ document.getElementById('answered').textContent=`উত্তর দেওয়া হয়েছে: ${Object.keys(answers).length}`;
+ document.getElementById('progress').style.width=((current+1)/questions.length*100)+'%';
+ document.getElementById('question').textContent=(current+1)+'. '+q[0];
+ const box=document.getElementById('options');box.innerHTML='';
+ q[1].forEach((op,i)=>{const b=document.createElement('button');b.className='option';b.textContent=String.fromCharCode(65+i)+'. '+op;b.disabled=answers[current]!==undefined;
+ if(answers[current]!==undefined){if(i===q[2])b.classList.add('correct');else if(i===answers[current])b.classList.add('wrong')}
+ b.onclick=()=>{answers[current]=i;render()};box.appendChild(b)});
+ const fb=document.getElementById('feedback');
+ if(answers[current]===undefined)fb.textContent='সঠিক উত্তর নির্বাচন করুন।';
+ else fb.innerHTML=(answers[current]===q[2]?'✅ সঠিক উত্তর! ':'❌ ভুল উত্তর। সঠিক উত্তর: '+String.fromCharCode(65+q[2])+'. '+q[1][q[2]]+'। ')+q[3];
+ document.getElementById('prev').disabled=current===0;
+ document.getElementById('next').textContent=current===questions.length-1?'ফলাফল দেখুন':'পরের প্রশ্ন';
+}
+function move(d){if(d===1&&current===questions.length-1){showResult();return}current=Math.max(0,Math.min(questions.length-1,current+d));render()}
+function showResult(){let score=questions.reduce((s,q,i)=>s+(answers[i]===q[2]?1:0),0);document.getElementById('quizArea').hidden=true;const r=document.getElementById('result');r.hidden=false;r.innerHTML=`<h2>কুইজ সম্পন্ন!</h2><div class="score">${score} / ${questions.length}</div><p>আপনার সঠিক উত্তরের সংখ্যা ${score}টি।</p><p>শতকরা নম্বর: ${Math.round(score/questions.length*100)}%</p>`}
+function restart(){current=0;answers={};document.getElementById('quizArea').hidden=false;document.getElementById('result').hidden=true;render()}
+render();
+</script></body></html>

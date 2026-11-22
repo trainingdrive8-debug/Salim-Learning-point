@@ -1,0 +1,478 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Casting Calculator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  /* Layout: input panel left; right panel shows volume, grade filter chips, then one result card per selected grade. Ready-mix design and per-m3 tables below. */
+  :root {
+    --bg: #eef1f4;
+    --surface: #ffffff;
+    --surface-2: #e3e8ee;
+    --fg: #17202a;
+    --muted: #5b6876;
+    --line: #cfd7e0;
+    --accent: #0b6e99;
+    --accent-ink: #ffffff;
+    --accent-soft: #d6ebf5;
+    --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171d;
+      --surface: #1b232c;
+      --surface-2: #26313d;
+      --fg: #e8edf2;
+      --muted: #9aa8b6;
+      --line: #33404d;
+      --accent: #5cc0ec;
+      --accent-ink: #0b1620;
+      --accent-soft: #1d3a4a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12171d;
+    --surface: #1b232c;
+    --surface-2: #26313d;
+    --fg: #e8edf2;
+    --muted: #9aa8b6;
+    --line: #33404d;
+    --accent: #5cc0ec;
+    --accent-ink: #0b1620;
+    --accent-soft: #1d3a4a;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.55;
+    padding-block: 24px 40px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 1020px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  h1 { font-size: 1.85rem; line-height: 1.2; margin: 0; font-weight: 700; text-wrap: balance; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 6px 0 0; max-width: 70ch; }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 20px; align-items: start; }
+  @media (max-width: 800px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; min-width: 0; }
+  .panel h2 { font-size: 0.78rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 0 0 14px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  label { font-weight: 600; font-size: 0.92rem; }
+  .hint { color: var(--muted); font-size: 0.8rem; font-weight: 400; }
+  select, input {
+    font: inherit; color: var(--fg); background: var(--bg);
+    border: 1.5px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; width: 100%; min-height: 46px;
+  }
+  select:focus-visible, input:focus-visible, button:focus-visible, tr[tabindex]:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 1px; border-color: var(--accent);
+  }
+  .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .opt { margin-top: 6px; padding-top: 16px; border-top: 1px dashed var(--line); }
+  .opt .field:last-child { margin-bottom: 0; }
+  .opt-t { font-size: 0.78rem; color: var(--muted); margin: 0 0 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+
+  /* volume */
+  .hero { display: flex; flex-direction: column; gap: 2px; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .hero .k { color: var(--muted); font-size: 0.88rem; }
+  .hero .v { font-size: 2.6rem; font-weight: 700; line-height: 1.15; color: var(--accent); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .hero .v small { font-size: 1.05rem; font-weight: 600; color: var(--fg); margin-left: 6px; }
+  .hero .eq { color: var(--muted); font-size: 0.88rem; }
+  .vols { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-bottom: 18px; font-variant-numeric: tabular-nums; }
+  .vols div { display: flex; gap: 8px; align-items: baseline; }
+  .vols span:first-child { color: var(--muted); font-size: 0.88rem; }
+  .vols span:last-child { font-weight: 600; }
+
+  /* filter chips */
+  .filter-t { font-size: 0.85rem; color: var(--muted); font-weight: 600; margin: 0 0 8px; }
+  .tbl + .filter-t { margin-top: 20px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .chip {
+    font: inherit; font-weight: 600; cursor: pointer;
+    min-height: 44px; padding: 8px 16px; border-radius: 999px;
+    background: var(--bg); color: var(--fg); border: 1.5px solid var(--line);
+  }
+  .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .chip.all { background: transparent; }
+  .chip.all[aria-pressed="true"] { background: var(--accent); }
+
+  /* grade cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+  .card { border: 1.5px solid var(--line); border-radius: 10px; padding: 14px; min-width: 0; background: var(--bg); }
+  .card h3 { margin: 0; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .card h3 span { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+  .card .use { color: var(--muted); font-size: 0.8rem; margin: 2px 0 10px; }
+  .card .big { font-size: 2rem; font-weight: 700; color: var(--accent); line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .card .big small { font-size: 0.9rem; font-weight: 600; color: var(--fg); margin-left: 5px; }
+  .card .bigk { color: var(--muted); font-size: 0.8rem; margin-bottom: 10px; }
+  .card dl { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+  .card .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); min-width: 0; }
+  .card .row dt { color: var(--muted); font-size: 0.88rem; }
+  .card .row dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+  .card .row.w dd { color: var(--accent); }
+  .tag { display: inline-block; margin-top: 4px; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--fg); font-size: 0.75rem; font-weight: 600; }
+  .empty { color: var(--muted); padding: 12px; border: 1.5px dashed var(--line); border-radius: 8px; }
+  .err { color: #b3261e; font-weight: 600; }
+  :root[data-theme="dark"] .err { color: #ff8a80; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .err { color: #ff8a80; } }
+
+  /* tables */
+  .tbl { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 760px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: top; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 0.78rem; color: var(--muted); font-weight: 600; background: var(--surface-2); }
+  small { color: var(--muted); font-weight: 400; }
+  tbody tr.click { cursor: pointer; }
+  tbody tr.click:hover { background: var(--surface-2); }
+  tbody tr.sel { background: var(--accent-soft); font-weight: 600; }
+  .note { color: var(--muted); font-size: 0.83rem; margin: 12px 0 0; max-width: 90ch; }
+  .l { text-align: left; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Casting Calculator</h1>
+    <p class="sub">Enter the casting dimensions. See the volume in cubic metres, and the cement, sand, stone, water and admixture needed for each grade from M5 to M30+.</p>
+  </header>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="in-h">
+      <h2 id="in-h">Inputs</h2>
+      <div class="pair">
+        <div class="field">
+          <label for="len">Length <span class="hint">ft</span></label>
+          <input id="len" type="text" inputmode="decimal" value="20" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="wid">Width <span class="hint">ft</span></label>
+          <input id="wid" type="text" inputmode="decimal" value="15" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="thk">Thickness / height <span class="hint">inch</span></label>
+          <input id="thk" type="text" inputmode="decimal" value="5" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="qty">Quantity <span class="hint">identical pieces</span></label>
+          <input id="qty" type="text" inputmode="numeric" value="1" autocomplete="off">
+        </div>
+      </div>
+      <div class="opt">
+        <p class="opt-t">Optional</p>
+        <div class="pair">
+          <div class="field">
+            <label for="waste">Wastage %</label>
+            <input id="waste" type="text" inputmode="decimal" value="5" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="adm">Admixture dose % <span class="hint">of cement weight</span></label>
+            <input id="adm" type="text" inputmode="decimal" value="1" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="p-c">Cement <span class="hint">৳ / bag</span></label>
+            <input id="p-c" type="text" inputmode="decimal" placeholder="e.g. 540" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="p-s">Sand <span class="hint">৳ / cft</span></label>
+            <input id="p-s" type="text" inputmode="decimal" placeholder="e.g. 35" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="p-g">Stone <span class="hint">৳ / cft</span></label>
+            <input id="p-g" type="text" inputmode="decimal" placeholder="e.g. 140" autocomplete="off">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="out-h" aria-live="polite">
+      <h2 id="out-h">Results</h2>
+      <div id="msg" class="err" hidden></div>
+      <div id="out">
+        <div class="hero">
+          <span class="k">Casting volume</span>
+          <span class="v"><span id="r-m3">0</span><small>m³</small></span>
+          <span class="eq" id="r-eq"></span>
+        </div>
+        <div class="vols">
+          <div><span>Cubic feet (cft)</span><span id="r-cft"></span></div>
+          <div><span>Dry mix incl. wastage</span><span id="r-dry"></span></div>
+        </div>
+        <p class="filter-t" id="filter-t">Choose grades (you can select more than one)</p>
+        <div class="chips" id="chips" role="group" aria-labelledby="filter-t"></div>
+        <div class="cards" id="cards"></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel" id="rmc" aria-labelledby="rmc-h">
+    <h2 id="rmc-h">Ready-mix design: stone sizes and quantities (by weight, approximate)</h2>
+    <div class="field" style="max-width:380px">
+      <label for="split">Stone blend <span class="hint">20 mm : 10 mm</span></label>
+      <select id="split">
+        <option value="0.7">70 : 30</option>
+        <option value="0.6" selected>60 : 40 (common)</option>
+        <option value="0.5">50 : 50 (for pumping)</option>
+        <option value="1">100 : 0 (20 mm only)</option>
+      </select>
+    </div>
+    <p class="filter-t">Total for this job (selected grades above, volume incl. wastage)</p>
+    <div class="tbl">
+      <table>
+        <thead>
+          <tr><th>Grade</th><th>Cement</th><th>Sand</th><th>20 mm stone</th><th>10 mm stone</th><th>Water</th><th>Admixture</th></tr>
+        </thead>
+        <tbody id="rmc-job"></tbody>
+      </table>
+    </div>
+    <p class="note" id="rmc-skip" hidden>M5 and M10 are not usually designed as ready mix, so they are left out here. Use the ratio cards above for them.</p>
+    <p class="filter-t">Design mix per 1 m³ of concrete</p>
+    <div class="tbl">
+      <table>
+        <thead>
+          <tr><th>Grade</th><th>Cement (kg)</th><th>Water (L)</th><th>Water:cement</th><th>Sand (kg)</th><th>20 mm (kg)</th><th>10 mm (kg)</th><th>Admixture (L)</th></tr>
+        </thead>
+        <tbody id="rmc-ref"></tbody>
+      </table>
+    </div>
+    <p class="filter-t">Stone size by type of work</p>
+    <div class="tbl">
+      <table>
+        <thead>
+          <tr><th>Type of work</th><th class="l">Stone size</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>RCC slab, beam, column</td><td class="l">Up to 20 mm (3/4 in), blended with 10 mm</td></tr>
+          <tr><td>Dense reinforcement, thin or narrow sections</td><td class="l">12.5 mm (1/2 in) or 10 mm</td></tr>
+          <tr><td>Pumped concrete</td><td class="l">Up to 20 mm, more 10 mm share (about 50%)</td></tr>
+          <tr><td>PCC, foundations, thick pours</td><td class="l">20 to 40 mm (1.5 in)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">The design mix is an approximate absolute-volume calculation (IS 10262 style). Assumed: specific gravity of cement 3.15, sand 2.65, stone 2.70; 2% entrapped air; sand is 40% of total aggregate by volume; water 165 L/m³ (160 for M35 and M40), assuming the admixture reduces water. Conversion to cft uses 1,600 kg/m³ for sand and 1,500 kg/m³ for stone (loose), which changes with real density and moisture. A larger 10 mm share makes pumping easier but needs a little more cement. The ready-mix plant's own tested design mix is the final word. When ordering, state the grade, slump, maximum stone size and admixture.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="tb-h">
+    <h2 id="tb-h">Per 1 m³ of concrete by ratio (click a row to turn that grade on or off)</h2>
+    <div class="tbl">
+      <table>
+        <thead>
+          <tr><th>Grade</th><th>Ratio</th><th class="l">Use</th><th>Cement (bags)</th><th>Sand (cft)</th><th>Stone (cft)</th><th>Water (L)</th><th>Water:cement</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="note">Assumed: dry volume is 1.54 times the wet volume, 1 bag of cement (50 kg) = 1.25 cft, 1 m³ = 35.315 cft. Water comes from the water:cement ratio (M5: 0.65, M10: 0.60, M15: 0.55, M20: 0.50, M25: 0.45, M30+: 0.40). Adjust water for the moisture in sand and stone. Grades M30 and above are made with a design mix and have no fixed standard ratio; the 1 : 0.75 : 1.5 shown for M30+ is only a rough figure, so follow the project engineer's design mix when you have it. For multi-storey buildings or special structures, always use the engineer's design. Results are approximate.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  var GRADES = [
+    { id: 'M5',   c: 1, s: 4,    g: 8,   wc: 0.65, use: 'Light work, base layer below levelling (PCC)' },
+    { id: 'M10',  c: 1, s: 3,    g: 6,   wc: 0.60, use: 'Ordinary PCC, pathways, light base' },
+    { id: 'M15',  c: 1, s: 2,    g: 4,   wc: 0.55, use: 'General concrete, floors, below foundations of small structures' },
+    { id: 'M20',  c: 1, s: 1.5,  g: 3,   wc: 0.50, use: 'Ordinary RCC: roof, beam, column, slab' },
+    { id: 'M25',  c: 1, s: 1,    g: 2,   wc: 0.45, use: 'Heavy-load RCC, large columns, special structures' },
+    { id: 'M30+', c: 1, s: 0.75, g: 1.5, wc: 0.40, use: 'Large structures, bridges, high-strength work', approx: true }
+  ];
+  var active = { 'M5': false, 'M10': false, 'M15': false, 'M20': true, 'M25': true, 'M30+': false };
+  var DRY = 1.54, BAG = 1.25, BAG_KG = 50, M3 = 35.3147, ADM_DENSITY = 1.1;
+  var BN = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+
+  function $(id) { return document.getElementById(id); }
+  function en(s) {
+    return String(s).replace(/[০-৯]/g, function (c) { return BN.indexOf(c); }).replace(/,/g, '').trim();
+  }
+  function fmt(n, dp) {
+    var s = (+n).toFixed(dp);
+    if (s.indexOf('.') > -1) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    var parts = s.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
+  }
+  function ratio(g) { return g.c + ' : ' + g.s + ' : ' + g.g; }
+  function num(id, dflt) {
+    var raw = en($(id).value);
+    if (raw === '') return dflt;
+    var v = parseFloat(raw);
+    return isNaN(v) ? NaN : v;
+  }
+  function parts(g, dryCft) {
+    var sum = g.c + g.s + g.g;
+    var bags = dryCft * g.c / sum / BAG;
+    return { bags: bags, sand: dryCft * g.s / sum, stone: dryCft * g.g / sum, water: bags * BAG_KG * g.wc };
+  }
+  function anyActive() { return GRADES.some(function (g) { return active[g.id]; }); }
+  function allActive() { return GRADES.every(function (g) { return active[g.id]; }); }
+  function plural(n, one, many) { return n === 1 ? one : many; }
+
+  // chips
+  var chipsEl = $('chips');
+  var allBtn = document.createElement('button');
+  allBtn.type = 'button'; allBtn.className = 'chip all'; allBtn.textContent = 'All grades';
+  allBtn.addEventListener('click', function () {
+    var v = !allActive();
+    GRADES.forEach(function (g) { active[g.id] = v; });
+    calc();
+  });
+  chipsEl.appendChild(allBtn);
+  var chipBtns = GRADES.map(function (g) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = g.id;
+    b.addEventListener('click', function () { active[g.id] = !active[g.id]; calc(); });
+    chipsEl.appendChild(b);
+    return b;
+  });
+
+  // per 1 m3 reference table (by ratio, no wastage)
+  var tbody = $('tbody');
+  var rowEls = GRADES.map(function (g) {
+    var p = parts(g, M3 * DRY);
+    var tr = document.createElement('tr');
+    tr.className = 'click'; tr.tabIndex = 0;
+    tr.innerHTML = '<td>' + g.id + '</td><td>' + (g.approx ? '~ ' : '') + ratio(g) + '</td><td class="l">' + g.use +
+      '</td><td>' + fmt(p.bags, 1) + '</td><td>' + fmt(p.sand, 1) +
+      '</td><td>' + fmt(p.stone, 1) + '</td><td>' + fmt(p.water, 0) + '</td><td>' + fmt(g.wc, 2) + '</td>';
+    function tog() { active[g.id] = !active[g.id]; calc(); }
+    tr.addEventListener('click', tog);
+    tr.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tog(); } });
+    tbody.appendChild(tr);
+    return tr;
+  });
+
+  // ready-mix design by absolute volume (indicative)
+  var RMC = [
+    { id: 'M15', key: 'M15',  w: 165, wc: 0.55 },
+    { id: 'M20', key: 'M20',  w: 165, wc: 0.50 },
+    { id: 'M25', key: 'M25',  w: 165, wc: 0.45 },
+    { id: 'M30', key: 'M30+', w: 165, wc: 0.42 },
+    { id: 'M35', key: 'M35',  w: 160, wc: 0.40 },
+    { id: 'M40', key: 'M40',  w: 160, wc: 0.38 }
+  ];
+  var SAND_KG_CFT = 1600 / M3, STONE_KG_CFT = 1500 / M3;
+
+  function design(r, f20, adm) {
+    var C = r.w / r.wc;
+    var vagg = 1 - 0.02 - C / 3150 - r.w / 1000;
+    var sand = 0.40 * vagg * 2650;
+    var coarse = 0.60 * vagg * 2700;
+    return { c: C, w: r.w, sand: sand, s20: coarse * f20, s10: coarse * (1 - f20), adm: C * adm / 100 / ADM_DENSITY };
+  }
+
+  function renderRmc(volM3, adm) {
+    var f20 = parseFloat($('split').value);
+    var job = '', ref = '', shown = 0;
+    RMC.forEach(function (r) {
+      var d = design(r, f20, adm);
+      ref += '<tr><td>' + r.id + '</td><td>' + fmt(d.c, 0) + '</td><td>' + fmt(d.w, 0) + '</td><td>' + fmt(r.wc, 2) +
+        '</td><td>' + fmt(d.sand, 0) + '</td><td>' + fmt(d.s20, 0) + '</td><td>' + fmt(d.s10, 0) +
+        '</td><td>' + (adm > 0 ? fmt(d.adm, 2) : '—') + '</td></tr>';
+      if (active[r.key]) {
+        shown++;
+        job += '<tr><td>' + r.id + '</td>' +
+          '<td>' + fmt(d.c * volM3 / BAG_KG, 1) + ' bags<br><small>' + fmt(d.c * volM3, 0) + ' kg</small></td>' +
+          '<td>' + fmt(d.sand * volM3 / SAND_KG_CFT, 1) + ' cft<br><small>' + fmt(d.sand * volM3, 0) + ' kg</small></td>' +
+          '<td>' + fmt(d.s20 * volM3 / STONE_KG_CFT, 1) + ' cft<br><small>' + fmt(d.s20 * volM3, 0) + ' kg</small></td>' +
+          '<td>' + fmt(d.s10 * volM3 / STONE_KG_CFT, 1) + ' cft<br><small>' + fmt(d.s10 * volM3, 0) + ' kg</small></td>' +
+          '<td>' + fmt(d.w * volM3, 0) + ' L</td>' +
+          '<td>' + (adm > 0 ? fmt(d.adm * volM3, 1) + ' L' : '—') + '</td></tr>';
+      }
+    });
+    if (!shown) job = '<tr><td colspan="7" class="l">Select M15, M20, M25 or M30+ above to see quantities here.</td></tr>';
+    $('rmc-job').innerHTML = job;
+    $('rmc-ref').innerHTML = ref;
+    $('rmc-skip').hidden = !(active['M5'] || active['M10']);
+  }
+
+  function calc() {
+    var L = num('len', NaN), W = num('wid', NaN), T = num('thk', NaN), Q = num('qty', 1);
+    var waste = num('waste', 0);
+    var adm = num('adm', 0);
+    var pc = parseFloat(en($('p-c').value)), ps = parseFloat(en($('p-s').value)), pg = parseFloat(en($('p-g').value));
+
+    GRADES.forEach(function (g, i) {
+      chipBtns[i].setAttribute('aria-pressed', active[g.id] ? 'true' : 'false');
+      rowEls[i].classList.toggle('sel', !!active[g.id]);
+    });
+    allBtn.setAttribute('aria-pressed', allActive() ? 'true' : 'false');
+
+    var msg = $('msg'), out = $('out');
+    if (!(L > 0) || !(W > 0) || !(T > 0) || !(Q > 0) || isNaN(waste) || waste < 0 || isNaN(adm) || adm < 0) {
+      msg.hidden = false;
+      msg.textContent = 'Enter numbers above 0 for length, width, thickness and quantity. Wastage and admixture dose must be 0 or more.';
+      out.hidden = true;
+      $('rmc').hidden = true;
+      return;
+    }
+    msg.hidden = true; out.hidden = false; $('rmc').hidden = false;
+
+    var cft = L * W * T / 12 * Q;
+    var dry = cft * DRY * (1 + waste / 100);
+
+    $('r-m3').textContent = fmt(cft / M3, 3);
+    $('r-eq').textContent = (Q !== 1 ? fmt(Q, 0) + ' pcs × ' : '') + fmt(L, 2) + ' × ' + fmt(W, 2) + ' ft, ' + fmt(T, 2) + ' in thick';
+    $('r-cft').textContent = fmt(cft, 2) + ' cft';
+    $('r-dry').textContent = fmt(dry, 2) + ' cft';
+    renderRmc(cft * (1 + waste / 100) / M3, adm);
+
+    var cards = $('cards');
+    cards.innerHTML = '';
+    if (!anyActive()) {
+      var e = document.createElement('div');
+      e.className = 'empty';
+      e.textContent = 'No grade selected. Choose one or more grades above.';
+      cards.appendChild(e);
+      return;
+    }
+    GRADES.forEach(function (g) {
+      if (!active[g.id]) return;
+      var p = parts(g, dry);
+      var buy = Math.ceil(p.bags - 1e-9);
+      var costHtml = '';
+      if (pc > 0 || ps > 0 || pg > 0) {
+        var cost = (pc > 0 ? buy * pc : 0) + (ps > 0 ? p.sand * ps : 0) + (pg > 0 ? p.stone * pg : 0);
+        costHtml = '<div class="row w"><dt>Estimated cost</dt><dd>৳ ' + fmt(cost, 0) + '</dd></div>';
+      }
+      var admHtml = '';
+      if (adm > 0) {
+        var admKg = p.bags * BAG_KG * adm / 100;
+        admHtml = '<div class="row w"><dt>Admixture</dt><dd>' + fmt(admKg / ADM_DENSITY, 2) + ' L</dd></div>' +
+          '<div class="row"><dt>Admixture (weight)</dt><dd>' + fmt(admKg, 2) + ' kg</dd></div>';
+      }
+      var d = document.createElement('article');
+      d.className = 'card';
+      d.innerHTML =
+        '<h3>' + g.id + ' <span>' + (g.approx ? '~ ' : '') + ratio(g) + '</span></h3>' +
+        '<div class="use">' + g.use + (g.approx ? '<br><span class="tag">Approximate ratio, design mix needed</span>' : '') + '</div>' +
+        '<div class="big">' + fmt(p.bags, 1) + '<small>bags of cement</small></div>' +
+        '<div class="bigk">Buy ' + fmt(buy, 0) + ' ' + plural(buy, 'bag', 'bags') + ' (' + fmt(p.bags * BAG_KG, 0) + ' kg)</div>' +
+        '<dl>' +
+        '<div class="row"><dt>Sand</dt><dd>' + fmt(p.sand, 1) + ' cft</dd></div>' +
+        '<div class="row"><dt>Stone</dt><dd>' + fmt(p.stone, 1) + ' cft</dd></div>' +
+        '<div class="row w"><dt>Water</dt><dd>' + fmt(p.water, 0) + ' L</dd></div>' +
+        '<div class="row"><dt>Water:cement</dt><dd>' + fmt(g.wc, 2) + '</dd></div>' +
+        admHtml +
+        costHtml +
+        '</dl>';
+      cards.appendChild(d);
+    });
+  }
+
+  ['len', 'wid', 'thk', 'qty', 'waste', 'adm', 'split', 'p-c', 'p-s', 'p-g'].forEach(function (id) {
+    $(id).addEventListener('input', calc);
+    $(id).addEventListener('change', calc);
+  });
+  calc();
+})();
+</script>
+
+</body></html>

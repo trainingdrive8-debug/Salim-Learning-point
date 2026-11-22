@@ -1,0 +1,373 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>কাস্টিং হিসাব</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>
+  /* Layout: input panel left; right panel shows volume, grade filter chips, then one result card per selected grade. Per-m3 table below. */
+  :root {
+    --bg: #eef1f4;
+    --surface: #ffffff;
+    --surface-2: #e3e8ee;
+    --fg: #17202a;
+    --muted: #5b6876;
+    --line: #cfd7e0;
+    --accent: #0b6e99;
+    --accent-ink: #ffffff;
+    --accent-soft: #d6ebf5;
+    --font: "Hind Siliguri", "Noto Sans Bengali", "Kalpurush", "Nirmala UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171d;
+      --surface: #1b232c;
+      --surface-2: #26313d;
+      --fg: #e8edf2;
+      --muted: #9aa8b6;
+      --line: #33404d;
+      --accent: #5cc0ec;
+      --accent-ink: #0b1620;
+      --accent-soft: #1d3a4a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12171d;
+    --surface: #1b232c;
+    --surface-2: #26313d;
+    --fg: #e8edf2;
+    --muted: #9aa8b6;
+    --line: #33404d;
+    --accent: #5cc0ec;
+    --accent-ink: #0b1620;
+    --accent-soft: #1d3a4a;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.55;
+    padding-block: 24px 40px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 1020px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0; font-weight: 700; text-wrap: balance; }
+  .sub { color: var(--muted); margin: 4px 0 0; }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 20px; align-items: start; }
+  @media (max-width: 800px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; min-width: 0; }
+  .panel h2 { font-size: 0.85rem; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; margin: 0 0 14px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  label { font-weight: 600; font-size: 0.95rem; }
+  .hint { color: var(--muted); font-size: 0.82rem; font-weight: 400; }
+  input {
+    font: inherit; color: var(--fg); background: var(--bg);
+    border: 1.5px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; width: 100%; min-height: 46px;
+  }
+  input:focus-visible, button:focus-visible, tr[tabindex]:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 1px; border-color: var(--accent);
+  }
+  .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .opt { margin-top: 6px; padding-top: 16px; border-top: 1px dashed var(--line); }
+  .opt .field:last-child { margin-bottom: 0; }
+  .opt-t { font-size: 0.82rem; color: var(--muted); margin: 0 0 12px; font-weight: 600; letter-spacing: 0.04em; }
+
+  /* volume */
+  .hero { display: flex; flex-direction: column; gap: 2px; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .hero .k { color: var(--muted); font-size: 0.9rem; }
+  .hero .v { font-size: 2.6rem; font-weight: 700; line-height: 1.15; color: var(--accent); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .hero .v small { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin-left: 6px; }
+  .hero .eq { color: var(--muted); font-size: 0.9rem; }
+  .vols { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-bottom: 18px; font-variant-numeric: tabular-nums; }
+  .vols div { display: flex; gap: 8px; align-items: baseline; }
+  .vols span:first-child { color: var(--muted); font-size: 0.9rem; }
+  .vols span:last-child { font-weight: 600; }
+
+  /* filter chips */
+  .filter-t { font-size: 0.85rem; color: var(--muted); font-weight: 600; margin: 0 0 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .chip {
+    font: inherit; font-weight: 600; cursor: pointer;
+    min-height: 44px; padding: 8px 16px; border-radius: 999px;
+    background: var(--bg); color: var(--fg); border: 1.5px solid var(--line);
+  }
+  .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .chip.all { background: transparent; }
+
+  /* grade cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+  .card { border: 1.5px solid var(--line); border-radius: 10px; padding: 14px; min-width: 0; background: var(--bg); }
+  .card h3 { margin: 0; font-size: 1.15rem; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .card h3 span { font-size: 0.82rem; color: var(--muted); font-weight: 500; }
+  .card .use { color: var(--muted); font-size: 0.82rem; margin: 2px 0 10px; }
+  .card .big { font-size: 2rem; font-weight: 700; color: var(--accent); line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .card .big small { font-size: 0.95rem; font-weight: 600; color: var(--fg); margin-left: 5px; }
+  .card .bigk { color: var(--muted); font-size: 0.82rem; margin-bottom: 10px; }
+  .card dl { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+  .card .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); min-width: 0; }
+  .card .row dt { color: var(--muted); font-size: 0.9rem; }
+  .card .row dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+  .card .row.w dd { color: var(--accent); }
+  .empty { color: var(--muted); padding: 12px; border: 1.5px dashed var(--line); border-radius: 8px; }
+  .err { color: #b3261e; font-weight: 600; }
+  :root[data-theme="dark"] .err { color: #ff8a80; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .err { color: #ff8a80; } }
+
+  /* table */
+  .tbl { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 860px; font-variant-numeric: tabular-nums; }
+  th:nth-child(3) { text-align: left; }
+  .tag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--fg); font-size: 0.78rem; font-weight: 600; }
+  th, td { text-align: right; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 0.82rem; color: var(--muted); font-weight: 600; background: var(--surface-2); }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: var(--surface-2); }
+  tbody tr.sel { background: var(--accent-soft); font-weight: 600; }
+  .note { color: var(--muted); font-size: 0.85rem; margin: 12px 0 0; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>কাস্টিং হিসাব</h1>
+    <p class="sub">ঢালাইয়ের মাপ দিন। কত ঘনমিটার ঢালাই হবে এবং M5 থেকে M30+ গ্রেডে আলাদা আলাদা সিমেন্ট, বালু, পাথর ও পানি কত লাগবে তা দেখাবে।</p>
+  </header>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="in-h">
+      <h2 id="in-h">ইনপুট</h2>
+      <div class="pair">
+        <div class="field">
+          <label for="len">লম্বা <span class="hint">ফুট</span></label>
+          <input id="len" type="text" inputmode="decimal" value="20" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="wid">চওড়া <span class="hint">ফুট</span></label>
+          <input id="wid" type="text" inputmode="decimal" value="15" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="thk">পুরুত্ব / উচ্চতা <span class="hint">ইঞ্চি</span></label>
+          <input id="thk" type="text" inputmode="decimal" value="5" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="qty">সংখ্যা <span class="hint">একই মাপের কয়টি</span></label>
+          <input id="qty" type="text" inputmode="numeric" value="1" autocomplete="off">
+        </div>
+      </div>
+      <div class="opt">
+        <p class="opt-t">ঐচ্ছিক</p>
+        <div class="pair">
+          <div class="field">
+            <label for="waste">ওয়েস্টেজ %</label>
+            <input id="waste" type="text" inputmode="decimal" value="5" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="p-c">সিমেন্ট (টাকা/ব্যাগ)</label>
+            <input id="p-c" type="text" inputmode="decimal" placeholder="যেমন ৫৪০" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="p-s">বালু (টাকা/সিএফটি)</label>
+            <input id="p-s" type="text" inputmode="decimal" placeholder="যেমন ৩৫" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="p-g">পাথর (টাকা/সিএফটি)</label>
+            <input id="p-g" type="text" inputmode="decimal" placeholder="যেমন ১৪০" autocomplete="off">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="out-h" aria-live="polite">
+      <h2 id="out-h">ফলাফল</h2>
+      <div id="msg" class="err" hidden></div>
+      <div id="out">
+        <div class="hero">
+          <span class="k">ঢালাইয়ের আয়তন</span>
+          <span class="v"><span id="r-m3">০</span><small>ঘনমিটার</small></span>
+          <span class="eq" id="r-eq"></span>
+        </div>
+        <div class="vols">
+          <div><span>ঘনফুট (সিএফটি)</span><span id="r-cft"></span></div>
+          <div><span>শুকনো মিক্স (ওয়েস্টেজসহ)</span><span id="r-dry"></span></div>
+        </div>
+        <p class="filter-t" id="filter-t">গ্রেড বেছে নিন (একাধিক বাছা যাবে)</p>
+        <div class="chips" id="chips" role="group" aria-labelledby="filter-t"></div>
+        <div class="cards" id="cards"></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="tb-h">
+    <h2 id="tb-h">প্রতি ১ ঘনমিটার ঢালাইয়ে লাগে (সারিতে চাপ দিলে সেই গ্রেড চালু বা বন্ধ হবে)</h2>
+    <div class="tbl">
+      <table>
+        <thead>
+          <tr><th>গ্রেড</th><th>অনুপাত</th><th>ব্যবহার</th><th>সিমেন্ট (ব্যাগ)</th><th>বালু (সিএফটি)</th><th>পাথর (সিএফটি)</th><th>পানি (লিটার)</th><th>পানি:সিমেন্ট</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="note">ধরে নেওয়া হয়েছে: ভেজা আয়তন থেকে শুকনো আয়তন ১.৫৪ গুণ, ১ ব্যাগ সিমেন্ট (৫০ কেজি) = ১.২৫ সিএফটি, ১ ঘনমিটার = ৩৫.৩১৫ সিএফটি। পানির পরিমাণ পানি:সিমেন্ট অনুপাত দিয়ে হিসাব করা (M5: ০.৬৫, M10: ০.৬০, M15: ০.৫৫, M20: ০.৫০, M25: ০.৪৫, M30+: ০.৪০)। বালু ও পাথরের আর্দ্রতা এবং ভরাটের পরিমাণ অনুযায়ী পানি কমবেশি করতে হয়। M30 ও তার বেশি গ্রেড ডিজাইন মিক্স দিয়ে করা হয়, এর কোনো নির্দিষ্ট প্রচলিত অনুপাত নেই। এখানে M30+ এর জন্য ১ : ০.৭৫ : ১.৫ একটি মোটামুটি ধরা অনুপাত দেওয়া আছে, প্রকল্পের প্রকৌশলীর ডিজাইন মিক্স পেলে সেটাই অনুসরণ করুন। ফলাফল আনুমানিক।</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  var GRADES = [
+    { id: 'M5',   c: 1, s: 4,    g: 8,   wc: 0.65, use: 'হালকা কাজ, লেভেলিংয়ের নিচের স্তর (PCC)' },
+    { id: 'M10',  c: 1, s: 3,    g: 6,   wc: 0.60, use: 'সাধারণ পিসিসি (PCC), পাথওয়ে, হালকা বেস' },
+    { id: 'M15',  c: 1, s: 2,    g: 4,   wc: 0.55, use: 'সাধারণ কংক্রিট, মেঝে, ছোট কাঠামোর ভিত্তির নিচে' },
+    { id: 'M20',  c: 1, s: 1.5,  g: 3,   wc: 0.50, use: 'সাধারণ আরসিসি (RCC): ছাদ, বিম, কলাম, স্ল্যাব' },
+    { id: 'M25',  c: 1, s: 1,    g: 2,   wc: 0.45, use: 'ভারী লোডের আরসিসি, বড় কলাম, বিশেষ অবকাঠামো' },
+    { id: 'M30+', c: 1, s: 0.75, g: 1.5, wc: 0.40, use: 'বড় অবকাঠামো, ব্রিজ, উচ্চ-ক্ষমতার কাঠামো', approx: true }
+  ];
+  var active = { 'M5': false, 'M10': false, 'M15': false, 'M20': true, 'M25': true, 'M30+': false };
+  var DRY = 1.54, BAG = 1.25, BAG_KG = 50, M3 = 35.3147;
+  var BN = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+
+  function $(id) { return document.getElementById(id); }
+  function bn(s) { return String(s).replace(/[0-9]/g, function (c) { return BN[+c]; }); }
+  function en(s) {
+    return String(s).replace(/[০-৯]/g, function (c) { return BN.indexOf(c); })
+      .replace(/৷|,|،/g, '.').trim();
+  }
+  function fmt(n, dp) {
+    var s = (+n).toFixed(dp);
+    if (s.indexOf('.') > -1) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    var parts = s.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return bn(parts.join('.'));
+  }
+  function ratio(g) { return bn(g.c) + ' : ' + bn(g.s) + ' : ' + bn(g.g); }
+  function num(id, dflt) {
+    var raw = en($(id).value);
+    if (raw === '') return dflt;
+    var v = parseFloat(raw);
+    return isNaN(v) ? NaN : v;
+  }
+  function parts(g, dryCft) {
+    var sum = g.c + g.s + g.g;
+    var cementCft = dryCft * g.c / sum;
+    var bags = cementCft / BAG;
+    return { bags: bags, sand: dryCft * g.s / sum, stone: dryCft * g.g / sum, water: bags * BAG_KG * g.wc };
+  }
+  function anyActive() { return GRADES.some(function (g) { return active[g.id]; }); }
+  function allActive() { return GRADES.every(function (g) { return active[g.id]; }); }
+
+  // chips
+  var chipsEl = $('chips');
+  var allBtn = document.createElement('button');
+  allBtn.type = 'button'; allBtn.className = 'chip all'; allBtn.textContent = 'সব গ্রেড';
+  allBtn.addEventListener('click', function () {
+    var v = !allActive();
+    GRADES.forEach(function (g) { active[g.id] = v; });
+    calc();
+  });
+  chipsEl.appendChild(allBtn);
+  var chipBtns = GRADES.map(function (g) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = g.id;
+    b.addEventListener('click', function () { active[g.id] = !active[g.id]; calc(); });
+    chipsEl.appendChild(b);
+    return b;
+  });
+
+  // reference table (per 1 m3, no wastage)
+  var tbody = $('tbody');
+  var rowEls = GRADES.map(function (g) {
+    var p = parts(g, M3 * DRY);
+    var tr = document.createElement('tr');
+    tr.tabIndex = 0;
+    tr.innerHTML = '<td>' + g.id + '</td><td>' + (g.approx ? '~ ' : '') + ratio(g) + '</td><td style="text-align:left">' + g.use +
+      '</td><td>' + fmt(p.bags, 1) + '</td><td>' + fmt(p.sand, 1) +
+      '</td><td>' + fmt(p.stone, 1) + '</td><td>' + fmt(p.water, 0) + '</td><td>' + fmt(g.wc, 2) + '</td>';
+    function tog() { active[g.id] = !active[g.id]; calc(); }
+    tr.addEventListener('click', tog);
+    tr.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tog(); } });
+    tbody.appendChild(tr);
+    return tr;
+  });
+
+  function calc() {
+    var L = num('len', NaN), W = num('wid', NaN), T = num('thk', NaN), Q = num('qty', 1);
+    var waste = num('waste', 0);
+    var pc = parseFloat(en($('p-c').value)), ps = parseFloat(en($('p-s').value)), pg = parseFloat(en($('p-g').value));
+
+    GRADES.forEach(function (g, i) {
+      chipBtns[i].setAttribute('aria-pressed', active[g.id] ? 'true' : 'false');
+      rowEls[i].classList.toggle('sel', !!active[g.id]);
+    });
+    allBtn.setAttribute('aria-pressed', allActive() ? 'true' : 'false');
+    allBtn.className = 'chip all';
+
+    var msg = $('msg'), out = $('out');
+    if (!(L > 0) || !(W > 0) || !(T > 0) || !(Q > 0) || isNaN(waste) || waste < 0) {
+      msg.hidden = false;
+      msg.textContent = 'লম্বা, চওড়া, পুরুত্ব ও সংখ্যায় ০ এর বেশি সংখ্যা লিখুন। ওয়েস্টেজ ০ বা তার বেশি হতে হবে।';
+      out.hidden = true;
+      return;
+    }
+    msg.hidden = true; out.hidden = false;
+
+    var cft = L * W * T / 12 * Q;
+    var dry = cft * DRY * (1 + waste / 100);
+
+    $('r-m3').textContent = fmt(cft / M3, 3);
+    $('r-eq').textContent = (Q !== 1 ? fmt(Q, 0) + ' টি × ' : '') + fmt(L, 2) + ' × ' + fmt(W, 2) + ' ফুট, ' + fmt(T, 2) + ' ইঞ্চি পুরু';
+    $('r-cft').textContent = fmt(cft, 2) + ' সিএফটি';
+    $('r-dry').textContent = fmt(dry, 2) + ' সিএফটি';
+
+    var cards = $('cards');
+    cards.innerHTML = '';
+    if (!anyActive()) {
+      var e = document.createElement('div');
+      e.className = 'empty';
+      e.textContent = 'কোনো গ্রেড বাছা নেই। উপরের বোতাম থেকে এক বা একাধিক গ্রেড বেছে নিন।';
+      cards.appendChild(e);
+      return;
+    }
+    GRADES.forEach(function (g) {
+      if (!active[g.id]) return;
+      var p = parts(g, dry);
+      var buy = Math.ceil(p.bags - 1e-9);
+      var costHtml = '';
+      if (pc > 0 || ps > 0 || pg > 0) {
+        var cost = (pc > 0 ? buy * pc : 0) + (ps > 0 ? p.sand * ps : 0) + (pg > 0 ? p.stone * pg : 0);
+        costHtml = '<div class="row w"><dt>আনুমানিক খরচ</dt><dd>৳ ' + fmt(cost, 0) + '</dd></div>';
+      }
+      var d = document.createElement('article');
+      d.className = 'card';
+      d.innerHTML =
+        '<h3>' + g.id + ' <span>' + (g.approx ? '~ ' : '') + ratio(g) + '</span></h3>' +
+        '<div class="use">' + g.use + (g.approx ? '<br><span class="tag">আনুমানিক অনুপাত, ডিজাইন মিক্স লাগবে</span>' : '') + '</div>' +
+        '<div class="big">' + fmt(p.bags, 1) + '<small>ব্যাগ সিমেন্ট</small></div>' +
+        '<div class="bigk">কিনতে ' + bn(buy) + ' ব্যাগ (' + fmt(p.bags * BAG_KG, 0) + ' কেজি)</div>' +
+        '<dl>' +
+        '<div class="row"><dt>বালু</dt><dd>' + fmt(p.sand, 1) + ' সিএফটি</dd></div>' +
+        '<div class="row"><dt>পাথর</dt><dd>' + fmt(p.stone, 1) + ' সিএফটি</dd></div>' +
+        '<div class="row w"><dt>পানি</dt><dd>' + fmt(p.water, 0) + ' লিটার</dd></div>' +
+        '<div class="row"><dt>পানি:সিমেন্ট</dt><dd>' + fmt(g.wc, 2) + '</dd></div>' +
+        costHtml +
+        '</dl>';
+      cards.appendChild(d);
+    });
+  }
+
+  ['len', 'wid', 'thk', 'qty', 'waste', 'p-c', 'p-s', 'p-g'].forEach(function (id) {
+    $(id).addEventListener('input', calc);
+    $(id).addEventListener('change', calc);
+  });
+  calc();
+})();
+</script>
+
+</body></html>

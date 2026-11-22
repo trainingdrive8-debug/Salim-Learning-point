@@ -1,0 +1,347 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ঢালাইয়ের হিসাব</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>
+  /* Layout: input panel left, live result panel right; stacks on phones. Mix-ratio table below, rows select the ratio. */
+  :root {
+    --bg: #eef1f4;
+    --surface: #ffffff;
+    --surface-2: #e3e8ee;
+    --fg: #17202a;
+    --muted: #5b6876;
+    --line: #cfd7e0;
+    --accent: #0b6e99;
+    --accent-soft: #d6ebf5;
+    --c-cement: #7d8996;
+    --c-sand: #d2a85a;
+    --c-stone: #4b5b6b;
+    --font: "Hind Siliguri", "Noto Sans Bengali", "Kalpurush", "Nirmala UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171d;
+      --surface: #1b232c;
+      --surface-2: #26313d;
+      --fg: #e8edf2;
+      --muted: #9aa8b6;
+      --line: #33404d;
+      --accent: #5cc0ec;
+      --accent-soft: #1d3a4a;
+      --c-cement: #9aa6b3;
+      --c-sand: #c9a05a;
+      --c-stone: #6d7f91;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12171d;
+    --surface: #1b232c;
+    --surface-2: #26313d;
+    --fg: #e8edf2;
+    --muted: #9aa8b6;
+    --line: #33404d;
+    --accent: #5cc0ec;
+    --accent-soft: #1d3a4a;
+    --c-cement: #9aa6b3;
+    --c-sand: #c9a05a;
+    --c-stone: #6d7f91;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.55;
+    padding-block: 24px 40px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0; font-weight: 700; text-wrap: balance; }
+  .sub { color: var(--muted); margin: 4px 0 0; }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px; align-items: start; }
+  @media (max-width: 760px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; min-width: 0; }
+  .panel h2 { font-size: 0.85rem; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; margin: 0 0 14px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  label { font-weight: 600; font-size: 0.95rem; }
+  .hint { color: var(--muted); font-size: 0.82rem; font-weight: 400; }
+  select, input {
+    font: inherit; color: var(--fg); background: var(--bg);
+    border: 1.5px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; width: 100%; min-height: 46px;
+  }
+  select:focus-visible, input:focus-visible, tr[tabindex]:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 1px; border-color: var(--accent);
+  }
+  .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 420px) { .trio { grid-template-columns: minmax(0, 1fr); } }
+  .opt { margin-top: 6px; padding-top: 16px; border-top: 1px dashed var(--line); }
+  .opt .field:last-child { margin-bottom: 0; }
+
+  /* result */
+  .hero { display: flex; flex-direction: column; gap: 2px; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .hero .k { color: var(--muted); font-size: 0.9rem; }
+  .hero .v { font-size: 2.6rem; font-weight: 700; line-height: 1.15; color: var(--accent); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .hero .v small { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin-left: 6px; }
+  .hero .eq { color: var(--muted); font-size: 0.9rem; }
+
+  .mix { margin-bottom: 18px; }
+  .mixbar { display: flex; height: 26px; border-radius: 6px; overflow: hidden; }
+  .mixbar span { display: block; min-width: 4px; transition: flex-grow .2s ease; }
+  .mixbar .a { background: var(--c-cement); }
+  .mixbar .b { background: var(--c-sand); }
+  .mixbar .c { background: var(--c-stone); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; font-size: 0.85rem; color: var(--muted); }
+  .legend i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+  dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 20px; margin: 0; }
+  @media (max-width: 460px) { dl { grid-template-columns: minmax(0, 1fr); } }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); min-width: 0; }
+  .row dt { color: var(--muted); font-size: 0.92rem; }
+  .row dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+  .row.strong dd { color: var(--accent); }
+  .cost { display: none; }
+  .cost.on { display: flex; }
+  .err { color: #b3261e; font-weight: 600; }
+  :root[data-theme="dark"] .err { color: #ff8a80; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .err { color: #ff8a80; } }
+
+  /* table */
+  .tbl { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 520px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 0.82rem; color: var(--muted); font-weight: 600; background: var(--surface-2); }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: var(--surface-2); }
+  tbody tr.sel { background: var(--accent-soft); font-weight: 600; }
+  .note { color: var(--muted); font-size: 0.85rem; margin: 12px 0 0; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>ঢালাইয়ের হিসাব</h1>
+    <p class="sub">ঢালাইয়ের লম্বা, চওড়া (ফুট) আর পুরুত্ব (ইঞ্চি) দিন। সিমেন্ট, বালু ও পাথরের পরিমাণ নিচে সাথে সাথে দেখাবে।</p>
+  </header>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="in-h">
+      <h2 id="in-h">ইনপুট</h2>
+      <div class="trio">
+        <div class="field">
+          <label for="len">লম্বা <span class="hint">ফুট</span></label>
+          <input id="len" type="text" inputmode="decimal" value="20" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="wid">চওড়া <span class="hint">ফুট</span></label>
+          <input id="wid" type="text" inputmode="decimal" value="15" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="thk">পুরুত্ব <span class="hint">ইঞ্চি</span></label>
+          <input id="thk" type="text" inputmode="decimal" value="5" autocomplete="off">
+        </div>
+      </div>
+      <div class="field">
+        <label for="mix">মিক্সের অনুপাত <span class="hint">সিমেন্ট : বালু : পাথর</span></label>
+        <select id="mix"></select>
+      </div>
+      <div class="opt">
+        <div class="pair">
+          <div class="field">
+            <label for="waste">অপচয় % <span class="hint">ঐচ্ছিক</span></label>
+            <input id="waste" type="text" inputmode="decimal" value="5" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="p-c">সিমেন্ট (টাকা/ব্যাগ)</label>
+            <input id="p-c" type="text" inputmode="decimal" placeholder="যেমন ৫৪০" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="p-s">বালু (টাকা/সিএফটি)</label>
+            <input id="p-s" type="text" inputmode="decimal" placeholder="যেমন ৩৫" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="p-g">পাথর (টাকা/সিএফটি)</label>
+            <input id="p-g" type="text" inputmode="decimal" placeholder="যেমন ১৪০" autocomplete="off">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="out-h" aria-live="polite">
+      <h2 id="out-h">ফলাফল</h2>
+      <div id="msg" class="err" hidden></div>
+      <div id="out">
+        <div class="hero">
+          <span class="k">সিমেন্ট লাগবে</span>
+          <span class="v"><span id="r-bags">০</span><small>ব্যাগ</small></span>
+          <span class="eq" id="r-eq"></span>
+        </div>
+        <div class="mix">
+          <div class="mixbar" id="mixbar"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+          <div class="legend">
+            <span><i style="background:var(--c-cement)"></i><span id="l-c"></span></span>
+            <span><i style="background:var(--c-sand)"></i><span id="l-s"></span></span>
+            <span><i style="background:var(--c-stone)"></i><span id="l-g"></span></span>
+          </div>
+        </div>
+        <dl>
+          <div class="row"><dt>ঢালাইয়ের ক্ষেত্রফল</dt><dd id="r-area"></dd></div>
+          <div class="row"><dt>ঢালাইয়ের আয়তন (ভেজা)</dt><dd id="r-wet"></dd></div>
+          <div class="row"><dt>আয়তন (ঘনমিটার)</dt><dd id="r-m3"></dd></div>
+          <div class="row"><dt>শুকনো মিক্সের আয়তন</dt><dd id="r-dry"></dd></div>
+          <div class="row strong"><dt>সিমেন্ট (ব্যাগ)</dt><dd id="r-bags2"></dd></div>
+          <div class="row"><dt>সিমেন্ট (কেজি)</dt><dd id="r-kg"></dd></div>
+          <div class="row strong"><dt>বালু</dt><dd id="r-sand"></dd></div>
+          <div class="row strong"><dt>পাথর (খোয়া)</dt><dd id="r-stone"></dd></div>
+          <div class="row"><dt>পানি (আনুমানিক)</dt><dd id="r-water"></dd></div>
+          <div class="row cost strong" id="cost-row"><dt>আনুমানিক মোট খরচ</dt><dd id="r-cost"></dd></div>
+        </dl>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="tb-h">
+    <h2 id="tb-h">প্রতি ১০০ সিএফটি ঢালাইয়ে লাগে (সারিতে চাপ দিলে অনুপাত নির্বাচিত হবে)</h2>
+    <div class="tbl">
+      <table>
+        <thead>
+          <tr><th>অনুপাত</th><th>কোথায় ব্যবহার হয়</th><th>সিমেন্ট (ব্যাগ)</th><th>বালু (সিএফটি)</th><th>পাথর (সিএফটি)</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="note">ধরে নেওয়া হয়েছে: ভেজা আয়তন থেকে শুকনো আয়তন ১.৫৪ গুণ, ১ ব্যাগ সিমেন্ট (৫০ কেজি) = ১.২৫ সিএফটি, পানি-সিমেন্ট অনুপাত ০.৫। ১২ ইঞ্চি = ১ ফুট, ১ ঘনমিটার = ৩৫.৩১৫ সিএফটি। বালু ও পাথরের মান আর ঢালাইয়ের ধরনে সামান্য কম-বেশি হতে পারে, তাই ফলাফল আনুমানিক। কলাম বা বিমের জন্য লম্বা, চওড়া ও উচ্চতা বসিয়ে প্রতিটির হিসাব আলাদা করে যোগ করুন।</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  var MIXES = [
+    { c: 1, s: 1,   g: 2, use: 'বিম, কলাম (উচ্চ শক্তি)' },
+    { c: 1, s: 1.5, g: 3, use: 'ছাদ, বিম, কলাম' },
+    { c: 1, s: 2,   g: 4, use: 'ছাদ ঢালাই, সাধারণ কাজ' },
+    { c: 1, s: 3,   g: 6, use: 'ফ্লোর, ভিত, ফিলিং' }
+  ];
+  var DRY = 1.54, BAG = 1.25, BAG_KG = 50, WATER_L = 25, M3 = 35.3147;
+  var BN = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+
+  function $(id) { return document.getElementById(id); }
+  function bn(s) { return String(s).replace(/[0-9]/g, function (c) { return BN[+c]; }); }
+  function en(s) {
+    return String(s).replace(/[০-৯]/g, function (c) { return BN.indexOf(c); })
+      .replace(/৷|,|،/g, '.').trim();
+  }
+  function fmt(n, dp) {
+    var s = (+n).toFixed(dp);
+    if (s.indexOf('.') > -1) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    var parts = s.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return bn(parts.join('.'));
+  }
+  function ratio(m) { return bn(m.c) + ' : ' + bn(m.s) + ' : ' + bn(m.g); }
+  function num(id, dflt) {
+    var raw = en($(id).value);
+    if (raw === '') return dflt;
+    var v = parseFloat(raw);
+    return isNaN(v) ? NaN : v;
+  }
+  function parts(m, dryVol) {
+    var sum = m.c + m.s + m.g;
+    var cc = dryVol * m.c / sum;
+    return { bags: cc / BAG, sand: dryVol * m.s / sum, stone: dryVol * m.g / sum };
+  }
+
+  var mixSel = $('mix');
+  MIXES.forEach(function (m, i) {
+    var o = document.createElement('option');
+    o.value = i; o.textContent = ratio(m) + ' (' + m.use + ')';
+    if (i === 2) o.selected = true;
+    mixSel.appendChild(o);
+  });
+
+  var tbody = $('tbody');
+  MIXES.forEach(function (m, i) {
+    var p = parts(m, 100 * DRY);
+    var tr = document.createElement('tr');
+    tr.tabIndex = 0; tr.dataset.i = i;
+    tr.innerHTML = '<td>' + ratio(m) + '</td><td style="text-align:left">' + m.use + '</td><td>' + fmt(p.bags, 1) +
+      '</td><td>' + fmt(p.sand, 1) + '</td><td>' + fmt(p.stone, 1) + '</td>';
+    function pick() { mixSel.value = i; calc(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    tr.addEventListener('click', pick);
+    tr.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+    tbody.appendChild(tr);
+  });
+
+  function calc() {
+    var mi = +mixSel.value, m = MIXES[mi];
+    var L = num('len', NaN), W = num('wid', NaN), T = num('thk', NaN);
+    var waste = num('waste', 0);
+    var pc = parseFloat(en($('p-c').value)), ps = parseFloat(en($('p-s').value)), pg = parseFloat(en($('p-g').value));
+
+    Array.prototype.forEach.call(tbody.children, function (tr) {
+      tr.classList.toggle('sel', +tr.dataset.i === mi);
+    });
+
+    var msg = $('msg'), out = $('out');
+    if (!(L > 0) || !(W > 0) || !(T > 0) || isNaN(waste) || waste < 0) {
+      msg.hidden = false;
+      msg.textContent = 'লম্বা, চওড়া ও পুরুত্বে ০ এর বেশি সংখ্যা লিখুন। অপচয় ০ বা তার বেশি হতে হবে।';
+      out.hidden = true;
+      return;
+    }
+    msg.hidden = true; out.hidden = false;
+
+    var area = L * W;
+    var wet = area * T / 12;
+    var dry = wet * DRY * (1 + waste / 100);
+    var p = parts(m, dry);
+    var kg = p.bags * BAG_KG;
+    var water = p.bags * WATER_L;
+
+    $('r-bags').textContent = fmt(p.bags, 1);
+    $('r-eq').textContent = fmt(L, 2) + ' × ' + fmt(W, 2) + ' ফুট, ' + fmt(T, 2) + ' ইঞ্চি পুরু, মিক্স ' + ratio(m);
+    $('r-area').textContent = fmt(area, 2) + ' বর্গফুট';
+    $('r-wet').textContent = fmt(wet, 2) + ' সিএফটি';
+    $('r-m3').textContent = fmt(wet / M3, 3) + ' ঘনমিটার';
+    $('r-dry').textContent = fmt(dry, 2) + ' সিএফটি';
+    $('r-bags2').textContent = fmt(p.bags, 1) + ' ব্যাগ (কিনতে ' + bn(Math.ceil(p.bags - 1e-9)) + ' ব্যাগ)';
+    $('r-kg').textContent = fmt(kg, 0) + ' কেজি';
+    $('r-sand').textContent = fmt(p.sand, 1) + ' সিএফটি';
+    $('r-stone').textContent = fmt(p.stone, 1) + ' সিএফটি';
+    $('r-water').textContent = fmt(water, 0) + ' লিটার';
+
+    var cr = $('cost-row');
+    if (pc > 0 || ps > 0 || pg > 0) {
+      var cost = (pc > 0 ? Math.ceil(p.bags - 1e-9) * pc : 0) + (ps > 0 ? p.sand * ps : 0) + (pg > 0 ? p.stone * pg : 0);
+      cr.classList.add('on');
+      $('r-cost').textContent = '৳ ' + fmt(cost, 0);
+    } else {
+      cr.classList.remove('on');
+    }
+
+    var bar = $('mixbar').children;
+    bar[0].style.flex = m.c + ' 1 0'; bar[1].style.flex = m.s + ' 1 0'; bar[2].style.flex = m.g + ' 1 0';
+    $('l-c').textContent = 'সিমেন্ট ' + fmt(p.bags, 1) + ' ব্যাগ';
+    $('l-s').textContent = 'বালু ' + fmt(p.sand, 1) + ' সিএফটি';
+    $('l-g').textContent = 'পাথর ' + fmt(p.stone, 1) + ' সিএফটি';
+  }
+
+  ['mix', 'len', 'wid', 'thk', 'waste', 'p-c', 'p-s', 'p-g'].forEach(function (id) {
+    $(id).addEventListener('input', calc);
+    $(id).addEventListener('change', calc);
+  });
+  calc();
+})();
+</script>
+
+</body></html>

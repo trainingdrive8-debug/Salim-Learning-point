@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Salim Construction Calculator — Tiles Calculator</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:#172334;font-family:Arial,"Noto Sans Bengali",sans-serif;line-height:1.55}.wrap{max-width:1000px;margin:22px auto;padding:14px}.panel{background:#fff;padding:20px;border-radius:14px;margin-bottom:16px;box-shadow:0 4px 18px #10233b12}h1,h2{color:#15549a;margin:0 0 12px}h1{font-size:25px}h2{font-size:20px}.note{background:#fff7e6;border-left:4px solid #e3a126;padding:12px;border-radius:7px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:13px}label{font-weight:bold;font-size:14px;display:block;margin-bottom:5px}input,select{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px;background:#fff}button{border:0;border-radius:8px;padding:12px 18px;background:#15549a;color:#fff;font-size:16px;font-weight:bold;margin:12px 8px 0 0;cursor:pointer}.secondary{background:#475569}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px}.metric{background:#eef5ff;padding:13px;border-radius:9px}.metric small{display:block;color:#52657d}.metric strong{font-size:21px;color:#12477f}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #d8e0ea;padding:9px;text-align:left}th{background:#edf3fb}.muted{font-size:13px;color:#596779}.hide{display:none}@media print{body{background:white}.wrap{margin:0}.panel{box-shadow:none;border:1px solid #ddd}button{display:none}}
+</style></head>
+<body><div class="wrap">
+<section class="panel">
+<h1>🧱 টাইলসের হিসাব ক্যালকুলেটর</h1>
+<p>ফ্লোর, দেয়াল বা একাধিক রুমের মাপ দিয়ে টাইলসের সংখ্যা, বক্স, কাটিং ওয়েস্টেজ ও গ্রাউটের আনুমানিক হিসাব বের করুন।</p>
+<div class="note"><b>ব্যবহারের নিয়ম:</b> রুমের দৈর্ঘ্য-প্রস্থ এবং টাইলসের দৈর্ঘ্য-প্রস্থ একই ইউনিটে (ফুট/ইঞ্চি) ইনপুট দিন। টাইলস প্রতি বক্সে কয়টি আছে অথবা বক্সের কভারেজ বর্গফুট দিলে হিসাব আরও নির্ভুল হবে।</div>
+<div class="grid">
+<div><label>কাজের ধরন</label><select id="kind"><option value="floor">ফ্লোর টাইলস</option><option value="wall">ওয়াল টাইলস</option></select></div>
+<div><label>মাপের ইউনিট</label><select id="unit"><option value="ft">ফুট (ft)</option><option value="in">ইঞ্চি (inch)</option></select></div>
+<div><label>জায়গার দৈর্ঘ্য</label><input id="areaL" type="number" min=".01" step=".01" value="12"></div>
+<div><label>জায়গার প্রস্থ</label><input id="areaW" type="number" min=".01" step=".01" value="10"></div>
+<div><label>টাইলসের দৈর্ঘ্য (ইঞ্চি)</label><input id="tileL" type="number" min=".1" step=".1" value="24"></div>
+<div><label>টাইলসের প্রস্থ (ইঞ্চি)</label><input id="tileW" type="number" min=".1" step=".1" value="24"></div>
+<div><label>ওয়েস্টেজ (%)</label><input id="waste" type="number" min="0" step=".5" value="10"></div>
+<div><label>প্রতি বক্সে টাইলস (টি)</label><input id="perBox" type="number" min=".1" step=".1" value="4"></div>
+<div><label>অথবা প্রতি বক্স কভারেজ (বর্গফুট)</label><input id="boxCoverage" type="number" min="0" step=".01" placeholder="যেমন 16" value="16"></div>
+<div><label>গ্রাউট জয়েন্ট (মিমি)</label><input id="joint" type="number" min="0" step=".5" value="2"></div>
+<div><label>গ্রাউট ব্যবহারের হার (কেজি/বর্গমিটার)</label><input id="groutRate" type="number" min="0" step=".05" value="0.3"></div>
+</div>
+<button onclick="calculate()">হিসাব করুন</button><button class="secondary" onclick="window.print()">প্রিন্ট / PDF</button>
+</section>
+<section class="panel">
+<h2>📊 হিসাবের ফলাফল</h2>
+<div class="cards">
+<div class="metric"><small>মোট জায়গা</small><strong id="areaOut">—</strong><small>বর্গফুট</small></div>
+<div class="metric"><small>ওয়েস্টেজের আগে টাইলস</small><strong id="tileBase">—</strong><small>টি</small></div>
+<div class="metric"><small>ওয়েস্টেজসহ টাইলস</small><strong id="tileTotal">—</strong><small>টি</small></div>
+<div class="metric"><small>প্রয়োজনীয় বক্স</small><strong id="boxTotal">—</strong><small>বক্স</small></div>
+<div class="metric"><small>কেনার কভারেজ</small><strong id="coverOut">—</strong><small>বর্গফুট</small></div>
+<div class="metric"><small>আনুমানিক গ্রাউট</small><strong id="groutOut">—</strong><small>কেজি</small></div>
+</div>
+<table><thead><tr><th>বিবরণ</th><th>হিসাব</th></tr></thead><tbody id="details"></tbody></table>
+<div class="note"><b>মনে রাখবেন:</b> বক্সে টাইলসের সংখ্যা ও বক্স কভারেজের মধ্যে যেকোনো একটি সঠিকভাবে দিন। বক্স কভারেজ ০ হলে প্রতি বক্সে টাইলসের সংখ্যা থেকে বক্স গণনা হবে। বক্সে লেখা প্রকৃত কভারেজই কেনাকাটার সময় অগ্রাধিকার দিন।</div>
+</section>
+<section class="panel">
+<h2>📐 একাধিক রুম বা দেয়ালের হিসাব</h2>
+<p>একটি রুমের হিসাব করে ফলাফল লিখে রাখুন, এরপর পরের রুমের মাপ বসিয়ে হিসাব করুন। সব রুমের মোট যোগফল করতে প্রতিটি রুমের ক্ষেত্রফল যোগ করে এখানে দৈর্ঘ্য × প্রস্থের বদলে মোট ক্ষেত্রফল দিতে পারেন: প্রস্থ ১ ফুট এবং দৈর্ঘ্য = মোট বর্গফুট।</p>
+</section>
+<section class="panel muted">
+<b>হিসাবের সূত্র</b>
+<ul>
+<li>জায়গার ক্ষেত্রফল = দৈর্ঘ্য × প্রস্থ। ইঞ্চিতে হলে বর্গফুট = (দৈর্ঘ্য × প্রস্থ) ÷ ১৪৪।</li>
+<li>একটি টাইলসের ক্ষেত্রফল = (টাইলসের দৈর্ঘ্য × প্রস্থ) ÷ ১৪৪ বর্গফুট।</li>
+<li>টাইলসের সংখ্যা = জায়গার ক্ষেত্রফল ÷ একটি টাইলসের ক্ষেত্রফল।</li>
+<li>ওয়েস্টেজসহ টাইলস = মূল সংখ্যা × (১ + ওয়েস্টেজ% ÷ ১০০), পরের পূর্ণ সংখ্যায় রাউন্ড আপ।</li>
+<li>বক্স = প্রয়োজনীয় টাইলস ÷ প্রতি বক্সে টাইলস, পরের পূর্ণ বক্সে রাউন্ড আপ। বক্স কভারেজ দেওয়া থাকলে ক্ষেত্রফল ÷ বক্স কভারেজ।</li>
+</ul>
+<b>সতর্কতা:</b> দরজা-জানালা, কলাম, কাটিং প্যাটার্ন, ডায়াগোনাল লেআউট, ভাঙা/বাঁকা দেয়াল, টাইলসের ক্যালিবার ও ব্যাচভেদে পরিমাণ বদলায়। ৫–১০% ওয়েস্টেজ সাধারণ অনুমান; ডায়াগোনাল/জটিল ডিজাইনে ১০–১৫% বা প্রকল্প-নির্দিষ্ট হার ধরুন। গ্রাউটের পরিমাণ টাইলসের পুরুত্ব, জয়েন্টের গভীরতা ও নির্মাতার নির্দেশ অনুযায়ী পরিবর্তিত হবে—এখানে দেওয়া হার কেবল আনুমানিক।
+</section></div>
+<script>
+const $=id=>document.getElementById(id),v=id=>Number($(id).value),fmt=(n,d=2)=>Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+function calculate(){
+ const unit=$('unit').value, L=v('areaL'),W=v('areaW'),tL=v('tileL'),tW=v('tileW'),waste=v('waste'),perBox=v('perBox'),coverage=v('boxCoverage'),rate=v('groutRate'),joint=v('joint');
+ if([L,W,tL,tW,perBox].some(x=>!(x>0))||waste<0||coverage<0||rate<0||joint<0){alert('সঠিক মাপ ও পরিমাণ লিখুন।');return}
+ let area=unit==='ft'?L*W:L*W/144;
+ let tileArea=tL*tW/144;
+ let base=area/tileArea,total=Math.ceil(base*(1+waste/100));
+ let boxes=coverage>0?Math.ceil(area*(1+waste/100)/coverage):Math.ceil(total/perBox);
+ let bought=coverage>0?boxes*coverage:boxes*perBox*tileArea;
+ let grout=area/10.7639*rate; // kg per m2
+ $('areaOut').textContent=fmt(area);$('tileBase').textContent=Math.ceil(base).toLocaleString('en-US');$('tileTotal').textContent=total.toLocaleString('en-US');
+ $('boxTotal').textContent=boxes.toLocaleString('en-US');$('coverOut').textContent=fmt(bought);$('groutOut').textContent=fmt(grout);
+ const rows=[
+ ['কাজের ধরন',$('kind').value==='floor'?'ফ্লোর টাইলস':'ওয়াল টাইলস'],
+ ['জায়গার মাপ',`${fmt(L)} × ${fmt(W)} ${unit}`],
+ ['জায়গার ক্ষেত্রফল',`${fmt(area)} বর্গফুট`],
+ ['টাইলসের মাপ',`${fmt(tL,1)}″ × ${fmt(tW,1)}″`],
+ ['প্রতি টাইলসের ক্ষেত্রফল',`${fmt(tileArea,4)} বর্গফুট`],
+ ['ওয়েস্টেজ',`${fmt(waste,1)}%`],
+ ['ওয়েস্টেজসহ টাইলস',`${total} টি`],
+ ['প্রতি বক্সে টাইলস',`${fmt(perBox,1)} টি`],
+ ['প্রতি বক্স কভারেজ',coverage>0?`${fmt(coverage)} বর্গফুট`:'প্রদত্ত নয়; টাইলসের সংখ্যা দিয়ে বক্স হিসাব'],
+ ['প্রয়োজনীয় বক্স',`${boxes} বক্স`],
+ ['আনুমানিক গ্রাউট',`${fmt(grout)} কেজি (দেওয়া হার অনুযায়ী)`],
+ ['জয়েন্ট',`${fmt(joint,1)} মিমি`]
+ ];
+ $('details').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
+}
+calculate();
+</script></body></html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>থাই অ্যালুমিনিয়াম গ্লাস দরজার মালামাল হিসাব</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:#172334;font-family:Arial,"Noto Sans Bengali",sans-serif;line-height:1.55}.wrap{max-width:1000px;margin:22px auto;padding:14px}.panel{background:#fff;padding:20px;border-radius:14px;margin-bottom:16px;box-shadow:0 4px 18px #10233b12}h1,h2{color:#15549a;margin:0 0 12px}h1{font-size:25px}h2{font-size:19px}.note{background:#fff7e6;border-left:4px solid #e3a126;padding:12px;border-radius:7px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px}label{font-weight:bold;font-size:14px;display:block;margin-bottom:5px}input,select{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px}button{border:0;border-radius:8px;padding:12px 18px;background:#15549a;color:#fff;font-size:16px;font-weight:bold;margin:12px 8px 0 0;cursor:pointer}.secondary{background:#475569}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.metric{background:#eef5ff;padding:13px;border-radius:9px}.metric small{display:block;color:#52657d}.metric strong{font-size:21px;color:#12477f}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #d8e0ea;padding:9px;text-align:left}th{background:#edf3fb}.muted{font-size:13px;color:#596779}.hide{display:none}@media print{body{background:#fff}.wrap{margin:0}.panel{box-shadow:none;border:1px solid #ddd}button{display:none}}
+</style></head>
+<body><div class="wrap">
+<section class="panel">
+<h1>🚪 থাই অ্যালুমিনিয়াম গ্লাস দরজা — Material Calculator</h1>
+<p>দরজার মাপ ও প্রোফাইলের মাপ পরিবর্তন করে গ্লাস, অ্যালুমিনিয়াম, রাবার, হার্ডওয়্যার এবং আনুষঙ্গিক মালামালের আনুমানিক পরিমাণ বের করুন।</p>
+<div class="note"><b>হিসাবের ভিত্তি:</b> ১টি দরজা, ১২ ফুট লম্বা স্টিক, ১০% অ্যালুমিনিয়াম কাটিং ওয়েস্টেজ, ৫% গ্লাস ওয়েস্টেজ। প্রোফাইলের সঠিক নাম/সিরিজ ও সেকশন কোম্পানিভেদে আলাদা—তাই নিচের প্রোফাইল ফেস-উইডথ ও স্টিকের দৈর্ঘ্য নিজের পণ্যের সঙ্গে মিলিয়ে নিন।</div>
+<div class="grid">
+<div><label>দরজার ধরন</label><select id="kind"><option value="swing">সুইং / হিঞ্জ দরজা (এক পাল্লা)</option><option value="sliding">স্লাইডিং দরজা (দুই পাল্লা)</option></select></div>
+<div><label>দরজার উচ্চতা (ফুট)</label><input id="height" type="number" min="1" step=".1" value="7"></div>
+<div><label>দরজার মোট প্রস্থ (ফুট)</label><input id="width" type="number" min="1" step=".1" value="3"></div>
+<div><label>বাইরের ফ্রেমের ফেস (ইঞ্চি)</label><input id="outer" type="number" min=".25" step=".05" value="2"></div>
+<div><label>শাটার প্রোফাইলের ফেস (ইঞ্চি)</label><input id="shutter" type="number" min=".25" step=".05" value="2"></div>
+<div><label>গ্লাসের পুরুত্ব</label><select id="glass"><option value="5">৫ মিমি</option><option value="6">৬ মিমি</option><option value="8">৮ মিমি</option><option value="10">১০ মিমি</option></select></div>
+<div><label>প্রতি অ্যালুমিনিয়াম স্টিক (ফুট)</label><input id="stock" type="number" min="1" step="1" value="12"></div>
+<div><label>অ্যালুমিনিয়াম ওয়েস্টেজ (%)</label><input id="awaste" type="number" min="0" step="1" value="10"></div>
+<div><label>গ্লাস ওয়েস্টেজ (%)</label><input id="gwaste" type="number" min="0" step="1" value="5"></div>
+<div><label>স্লাইডিং ওভারল্যাপ (ইঞ্চি; স্লাইডিংয়ে)</label><input id="overlap" type="number" min="0" step=".25" value="1"></div>
+</div>
+<button onclick="calc()">হিসাব করুন</button><button class="secondary" onclick="window.print()">প্রিন্ট / PDF</button>
+</section>
+<section class="panel"><h2>📊 ফলাফল</h2><div class="cards">
+<div class="metric"><small>মোট গ্লাসের ক্ষেত্রফল (নেট)</small><strong id="glassNet">—</strong><small>বর্গফুট</small></div>
+<div class="metric"><small>গ্লাস অর্ডার (ওয়েস্টেজসহ)</small><strong id="glassOrder">—</strong><small>বর্গফুট</small></div>
+<div class="metric"><small>বাইরের ফ্রেম</small><strong id="outerLen">—</strong><small>রানিং ফুট</small></div>
+<div class="metric"><small>শাটার ফ্রেম</small><strong id="shutLen">—</strong><small>রানিং ফুট</small></div>
+<div class="metric"><small>মোট অ্যালুমিনিয়াম</small><strong id="alum">—</strong><small>রানিং ফুট (ওয়েস্টেজসহ)</small></div>
+<div class="metric"><small>মোট স্টিক</small><strong id="sticks">—</strong><small>টি (নির্বাচিত স্টিক দৈর্ঘ্য)</small></div>
+</div>
+<table><thead><tr><th>মালামালের নাম</th><th>আনুমানিক পরিমাণ</th><th>ব্যবহার</th></tr></thead><tbody id="rows"></tbody></table>
+<div class="note"><b>গ্লাস কাটিংয়ের সতর্কতা:</b> গ্লাসের চূড়ান্ত কাটিং সাইজ ফ্রেমের প্রকৃত ভিতরের খাঁজ/গ্লেজিং চ্যানেল, গ্যাসকেট ও ক্লিয়ারেন্স মেপে গ্লাস মিস্ত্রি নির্ধারণ করবেন। উপরের হিসাবটি আনুমানিক নেট ওপেনিং থেকে প্রোফাইল ফেস বাদ দিয়ে করা; সরাসরি এই মাপ দিয়ে গ্লাস কাটবেন না।</div>
+</section>
+<section class="panel muted">
+<b>এই হিসাবের সীমাবদ্ধতা:</b> এটি এক পাল্লার সুইং বা দুই পাল্লার স্লাইডিং গ্লাস দরজার প্রাথমিক BOQ। বাস্তবে থাই অ্যালুমিনিয়ামের নির্দিষ্ট সিরিজ/প্রোফাইল, ফ্রেমের ৩-পাশ/৪-পাশ, নিচে সিল/থ্রেশহোল্ড, লক-স্টাইল, গ্লাসের ধরন (টেম্পার্ড/ল্যামিনেটেড), দেয়ালের অবস্থা ও নির্মাতার কাটিং চার্ট অনুযায়ী পরিমাণ বদলাবে। প্রোফাইলের প্রতিটি আলাদা আইটেমের দৈর্ঘ্য এখানে মোট রানিং ফুটে দেখানো হয়েছে; কেনার আগে প্রোফাইল-ভিত্তিক কাটিং লিস্ট মিলিয়ে নিন।
+</section></div>
+<script>
+const el=id=>document.getElementById(id), n=id=>Number(el(id).value);
+const f=(x,d=2)=>Number(x).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+function calc(){
+ let H=n('height'),W=n('width'),O=n('outer'),S=n('shutter'),stock=n('stock'),aw=n('awaste'),gw=n('gwaste'),ov=n('overlap');
+ if([H,W,O,S,stock].some(x=>!(x>0))||aw<0||gw<0||ov<0){alert('সঠিক মাপ লিখুন।');return}
+ let slide=el('kind').value==='sliding';
+ let outerLen=2*H+(slide?2*W:W); // 4-side sliding frame; 3-side swing frame
+ let shutLen=slide?4*H+2*W:2*H+2*W; // two sliding leaves or one swing leaf
+ let netGlass;
+ if(!slide){
+   netGlass=Math.max(0,(W*12-2*S)*(H*12-2*S))/144;
+ }else{
+   let leafW=(W*12+ov)/2;
+   let paneW=Math.max(0,leafW-2*S);
+   let paneH=Math.max(0,H*12-2*S);
+   netGlass=2*paneW*paneH/144;
+ }
+ let glassOrder=netGlass*(1+gw/100);
+ let alum=(outerLen+shutLen)*(1+aw/100);
+ let sticks=Math.ceil(alum/stock);
+ // Approximate accessory quantities
+ let gasket=netGlass>0?2*(Math.sqrt(netGlass*144)*2):0; // indicative only; perimeter listed separately below
+ let glassPerim;
+ if(!slide) glassPerim=2*((W*12-2*S)+(H*12-2*S))/12;
+ else {let leafW=(W*12+ov)/2;glassPerim=2*2*((leafW-2*S)+(H*12-2*S))/12}
+ let screws=Math.ceil((outerLen+shutLen)/1.5);
+ let sealant=Math.max(1,Math.ceil((outerLen+shutLen)/45));
+ el('glassNet').textContent=f(netGlass);el('glassOrder').textContent=f(glassOrder);
+ el('outerLen').textContent=f(outerLen);el('shutLen').textContent=f(shutLen);
+ el('alum').textContent=f(alum);el('sticks').textContent=sticks;
+ let hardware=slide?[
+ ['স্লাইডিং রোলার','৪টি (২টি প্রতি পাল্লা)','শাটার চলাচল'],
+ ['স্লাইডিং লক','১ সেট','দরজা আটকানো'],
+ ['পুল হ্যান্ডেল','২টি','দুই পাল্লায়'],
+ ['স্টপার / গাইড','২–৪টি','চলাচল নিয়ন্ত্রণ']
+ ]:[
+ ['হিঞ্জ','৩টি','এক পাল্লার দরজা'],
+ ['ডোর লক','১ সেট','লক ও স্ট্রাইকসহ'],
+ ['হ্যান্ডেল','১ সেট / ২টি','খোলা-বন্ধ'],
+ ['ডোর স্টপার','১–২টি','দরজার চলাচল সীমিত']
+ ];
+ let data=[
+ ['থাই অ্যালুমিনিয়াম বাইরের ফ্রেম',f(outerLen)+' রানিং ফুট','হেড ও দুই পাশ (সুইং); স্লাইডিংয়ে চার পাশ'],
+ ['শাটার অ্যালুমিনিয়াম প্রোফাইল',f(shutLen)+' রানিং ফুট','সুইংয়ে ১ পাল্লা; স্লাইডিংয়ে ২ পাল্লা'],
+ ['অ্যালুমিনিয়াম মোট',f(alum)+' রানিং ফুট ≈ '+sticks+'টি × '+stock+' ফুট স্টিক','কাটিং ওয়েস্টেজসহ; বিভিন্ন প্রোফাইল আলাদা করে কিনতে হবে'],
+ ['গ্লাস ('+el('glass').value+' মিমি)',f(glassOrder)+' বর্গফুট অর্ডার','নেট '+f(netGlass)+' বর্গফুট + '+gw+'% ওয়েস্টেজ'],
+ ['গ্লাস রাবার / EPDM গ্যাসকেট',f(glassPerim*1.1)+' রানিং ফুট (আনুমানিক)','গ্লাসের চারপাশ; প্রোফাইলের খাঁজ অনুযায়ী'],
+ ['উইল / বিডিং (যদি আলাদা লাগে)',f(glassPerim*1.1)+' রানিং ফুট (আনুমানিক)','গ্লাস ধরে রাখার জন্য; প্রোফাইল সিস্টেমভেদে'],
+ ['সেল্ফ-ড্রিলিং স্ক্রু',screws+'–'+(screws+8)+' টি','ফ্রেম ও শাটার জোড়া'],
+ ['সিলিকন / ওয়েদার সিল্যান্ট',sealant+' কার্টিজ (আনুমানিক)','ফ্রেমের জোড়া ও পানি/ধুলা আটকাতে'],
+ ['কর্নার ক্লিট / অ্যাঙ্গেল',slide?'৮টি (আনুমানিক)':'৪টি (আনুমানিক)','শাটারের কোণা জোড়া']
+ ];
+ data=data.concat(hardware);
+ data.push(['অতিরিক্ত মালামাল','প্রয়োজন অনুযায়ী','স্ক্রু ক্যাপ, ড্রিল বিট, শিম/প্যাকার, ক্লিনার, কাটিং ডিস্ক']);
+ el('rows').innerHTML=data.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>').join('');
+}
+calc();
+</script></body></html>

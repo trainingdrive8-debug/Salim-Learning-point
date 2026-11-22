@@ -1,0 +1,397 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>গাঁথুনির হিসাব</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>
+  /* Layout: input panel left, live result panel right; stacks on phones. Table of 5/10/15 inch walls per 100 sq ft below. */
+  :root {
+    --bg: #eef1f4;
+    --surface: #ffffff;
+    --surface-2: #e3e8ee;
+    --fg: #17202a;
+    --muted: #5b6876;
+    --line: #cfd7e0;
+    --accent: #0b6e99;
+    --accent-soft: #d6ebf5;
+    --brick: #b4694f;
+    --mortar: #d9d4cb;
+    --font: "Hind Siliguri", "Noto Sans Bengali", "Kalpurush", "Nirmala UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171d;
+      --surface: #1b232c;
+      --surface-2: #26313d;
+      --fg: #e8edf2;
+      --muted: #9aa8b6;
+      --line: #33404d;
+      --accent: #5cc0ec;
+      --accent-soft: #1d3a4a;
+      --brick: #a5593f;
+      --mortar: #5a5f66;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12171d;
+    --surface: #1b232c;
+    --surface-2: #26313d;
+    --fg: #e8edf2;
+    --muted: #9aa8b6;
+    --line: #33404d;
+    --accent: #5cc0ec;
+    --accent-soft: #1d3a4a;
+    --brick: #a5593f;
+    --mortar: #5a5f66;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.55;
+    padding-block: 24px 40px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0; font-weight: 700; text-wrap: balance; }
+  .sub { color: var(--muted); margin: 4px 0 0; }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px; align-items: start; }
+  @media (max-width: 760px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; min-width: 0; }
+  .panel h2 { font-size: 0.85rem; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; margin: 0 0 14px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  label { font-weight: 600; font-size: 0.95rem; }
+  .hint { color: var(--muted); font-size: 0.82rem; font-weight: 400; }
+  select, input {
+    font: inherit; color: var(--fg); background: var(--bg);
+    border: 1.5px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; width: 100%; min-height: 46px;
+  }
+  select:focus-visible, input:focus-visible, tr[tabindex]:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 1px; border-color: var(--accent);
+  }
+  .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .opt { margin-top: 6px; padding-top: 16px; border-top: 1px dashed var(--line); }
+  .opt .field:last-child { margin-bottom: 0; }
+  .opt-t { font-size: 0.82rem; color: var(--muted); margin: 0 0 12px; font-weight: 600; letter-spacing: 0.04em; }
+
+  /* result */
+  .hero { display: flex; flex-direction: column; gap: 2px; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .hero .k { color: var(--muted); font-size: 0.9rem; }
+  .hero .v { font-size: 2.6rem; font-weight: 700; line-height: 1.15; color: var(--accent); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .hero .v small { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin-left: 6px; }
+  .hero .eq { color: var(--muted); font-size: 0.9rem; }
+
+  .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+  @media (max-width: 440px) { .three { grid-template-columns: minmax(0, 1fr); } }
+  .tile { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+  .tile .tk { color: var(--muted); font-size: 0.82rem; }
+  .tile .tv { font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .tile .tv small { font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-left: 4px; }
+
+  .wallview { margin-bottom: 18px; }
+  .wall {
+    height: 30px; border-radius: 4px; width: 66%;
+    background-color: var(--mortar);
+    background-image:
+      linear-gradient(to right, var(--mortar) 0 2px, transparent 2px),
+      linear-gradient(to bottom, var(--mortar) 0 3px, transparent 3px);
+    background-size: 28px 100%, 100% 10px;
+    background-color: var(--brick);
+    transition: width .2s ease;
+  }
+  .wall-cap { color: var(--muted); font-size: 0.8rem; margin-top: 6px; }
+
+  dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 20px; margin: 0; }
+  @media (max-width: 460px) { dl { grid-template-columns: minmax(0, 1fr); } }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); min-width: 0; }
+  .row dt { color: var(--muted); font-size: 0.92rem; }
+  .row dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+  .row.strong dd { color: var(--accent); }
+  .cost { display: none; }
+  .cost.on { display: flex; }
+  .err { color: #b3261e; font-weight: 600; }
+  :root[data-theme="dark"] .err { color: #ff8a80; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .err { color: #ff8a80; } }
+
+  /* table */
+  .tbl { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 520px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 0.82rem; color: var(--muted); font-weight: 600; background: var(--surface-2); }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: var(--surface-2); }
+  tbody tr.sel { background: var(--accent-soft); font-weight: 600; }
+  .note { color: var(--muted); font-size: 0.85rem; margin: 12px 0 0; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>গাঁথুনির হিসাব</h1>
+    <p class="sub">দেয়ালের লম্বা, উচ্চতা (ফুট) আর পুরুত্ব বেছে নিন। ওয়েস্টেজসহ ইট, সিমেন্ট ও বালুর পরিমাণ নিচে সাথে সাথে দেখাবে।</p>
+  </header>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="in-h">
+      <h2 id="in-h">ইনপুট</h2>
+      <div class="pair">
+        <div class="field">
+          <label for="len">দেয়ালের লম্বা <span class="hint">ফুট</span></label>
+          <input id="len" type="text" inputmode="decimal" value="20" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="hgt">উচ্চতা <span class="hint">ফুট</span></label>
+          <input id="hgt" type="text" inputmode="decimal" value="10" autocomplete="off">
+        </div>
+      </div>
+      <div class="field">
+        <label for="thk">দেয়ালের পুরুত্ব</label>
+        <select id="thk"></select>
+      </div>
+      <div class="field">
+        <label for="mix">মসলার অনুপাত <span class="hint">সিমেন্ট : বালু</span></label>
+        <select id="mix"></select>
+      </div>
+      <div class="opt">
+        <p class="opt-t">ঐচ্ছিক</p>
+        <div class="pair">
+          <div class="field">
+            <label for="open">দরজা-জানালা <span class="hint">বর্গফুট</span></label>
+            <input id="open" type="text" inputmode="decimal" value="0" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="w-b">ইটের ওয়েস্টেজ %</label>
+            <input id="w-b" type="text" inputmode="decimal" value="5" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="w-m">মসলার ওয়েস্টেজ %</label>
+            <input id="w-m" type="text" inputmode="decimal" value="10" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="p-b">ইট (টাকা/পিস)</label>
+            <input id="p-b" type="text" inputmode="decimal" placeholder="যেমন ১২" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="p-c">সিমেন্ট (টাকা/ব্যাগ)</label>
+            <input id="p-c" type="text" inputmode="decimal" placeholder="যেমন ৫৪০" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="p-s">বালু (টাকা/সিএফটি)</label>
+            <input id="p-s" type="text" inputmode="decimal" placeholder="যেমন ৩৫" autocomplete="off">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="out-h" aria-live="polite">
+      <h2 id="out-h">ফলাফল (ওয়েস্টেজসহ)</h2>
+      <div id="msg" class="err" hidden></div>
+      <div id="out">
+        <div class="hero">
+          <span class="k">ইট লাগবে</span>
+          <span class="v"><span id="r-brick">০</span><small>পিস</small></span>
+          <span class="eq" id="r-eq"></span>
+        </div>
+        <div class="three">
+          <div class="tile"><div class="tk">ইট</div><div class="tv"><span id="t-b"></span><small>পিস</small></div></div>
+          <div class="tile"><div class="tk">সিমেন্ট</div><div class="tv"><span id="t-c"></span><small>ব্যাগ</small></div></div>
+          <div class="tile"><div class="tk">বালু</div><div class="tv"><span id="t-s"></span><small>সিএফটি</small></div></div>
+        </div>
+        <div class="wallview">
+          <div class="wall" id="wall"></div>
+          <div class="wall-cap" id="wall-cap"></div>
+        </div>
+        <dl>
+          <div class="row"><dt>দেয়ালের ক্ষেত্রফল</dt><dd id="r-area"></dd></div>
+          <div class="row"><dt>দরজা-জানালা বাদে</dt><dd id="r-net"></dd></div>
+          <div class="row"><dt>গাঁথুনির আয়তন</dt><dd id="r-vol"></dd></div>
+          <div class="row"><dt>আয়তন (ঘনমিটার)</dt><dd id="r-m3"></dd></div>
+          <div class="row"><dt>ইট (ওয়েস্টেজ ছাড়া)</dt><dd id="r-b0"></dd></div>
+          <div class="row strong"><dt>ইট (ওয়েস্টেজসহ)</dt><dd id="r-b1"></dd></div>
+          <div class="row"><dt>ভেজা মসলা</dt><dd id="r-wet"></dd></div>
+          <div class="row"><dt>শুকনো মসলা</dt><dd id="r-dry"></dd></div>
+          <div class="row strong"><dt>সিমেন্ট (ব্যাগ)</dt><dd id="r-bags"></dd></div>
+          <div class="row"><dt>সিমেন্ট (কেজি)</dt><dd id="r-kg"></dd></div>
+          <div class="row strong"><dt>বালু</dt><dd id="r-sand"></dd></div>
+          <div class="row cost strong" id="cost-row"><dt>আনুমানিক মোট খরচ</dt><dd id="r-cost"></dd></div>
+        </dl>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="tb-h">
+    <h2 id="tb-h">প্রতি ১০০ বর্গফুট দেয়ালে লাগে, ওয়েস্টেজসহ (সারিতে চাপ দিলে পুরুত্ব নির্বাচিত হবে)</h2>
+    <div class="tbl">
+      <table>
+        <thead>
+          <tr><th>পুরুত্ব</th><th>ইট (পিস)</th><th>সিমেন্ট (ব্যাগ)</th><th>বালু (সিএফটি)</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="note">ধরে নেওয়া হয়েছে: ইটের মাপ ৯.৫ × ৪.৫ × ২.৭৫ ইঞ্চি, জোড়ার মসলা ০.৫ ইঞ্চি (মসলাসহ ইট ১০ × ৫ × ৩.২৫ ইঞ্চি)। শুকনো মসলা ভেজা মসলার ১.২৭ গুণ, ১ ব্যাগ সিমেন্ট (৫০ কেজি) = ১.২৫ সিএফটি। ৫ ইঞ্চি দেয়াল ইটের পাশ দিয়ে, ১০ ইঞ্চি এক ইট, ১৫ ইঞ্চি দেড় ইট। ইটের মাপ ও ভাটা ভেদে সংখ্যা কম-বেশি হতে পারে, তাই ফলাফল আনুমানিক।</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  var THICK = [
+    { t: 5,  n: '৫ ইঞ্চি (আধা ইট)' },
+    { t: 10, n: '১০ ইঞ্চি (১ ইট)' },
+    { t: 15, n: '১৫ ইঞ্চি (দেড় ইট)' }
+  ];
+  var MIXES = [
+    { c: 1, s: 4, use: 'লোড বেয়ারিং ও বাইরের দেয়াল' },
+    { c: 1, s: 5, use: 'সাধারণ দেয়াল' },
+    { c: 1, s: 6, use: 'পার্টিশন ও ভেতরের দেয়াল' }
+  ];
+  var BL = 9.5, BW = 4.5, BH = 2.75, JT = 0.5;
+  var DRY = 1.27, BAG = 1.25, BAG_KG = 50, M3 = 35.3147;
+  var BN = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+
+  function $(id) { return document.getElementById(id); }
+  function bn(s) { return String(s).replace(/[0-9]/g, function (c) { return BN[+c]; }); }
+  function en(s) {
+    return String(s).replace(/[০-৯]/g, function (c) { return BN.indexOf(c); })
+      .replace(/৷|,|،/g, '.').trim();
+  }
+  function fmt(n, dp) {
+    var s = (+n).toFixed(dp);
+    if (s.indexOf('.') > -1) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    var parts = s.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return bn(parts.join('.'));
+  }
+  function ratio(m) { return bn(m.c) + ' : ' + bn(m.s); }
+  function num(id, dflt) {
+    var raw = en($(id).value);
+    if (raw === '') return dflt;
+    var v = parseFloat(raw);
+    return isNaN(v) ? NaN : v;
+  }
+
+  // per 1 cft of finished masonry
+  var BRICKS_PER_CFT = 1728 / ((BL + JT) * (BW + JT) * (BH + JT));
+  var MORTAR_PER_CFT = 1 - BRICKS_PER_CFT * (BL * BW * BH) / 1728;
+
+  function quantities(vol, m, wb, wm) {
+    var b0 = vol * BRICKS_PER_CFT;
+    var wet = vol * MORTAR_PER_CFT;
+    var dry = wet * DRY * (1 + wm / 100);
+    var sum = m.c + m.s;
+    return {
+      b0: b0,
+      b1: b0 * (1 + wb / 100),
+      wet: wet,
+      dry: dry,
+      bags: dry * m.c / sum / BAG,
+      sand: dry * m.s / sum
+    };
+  }
+
+  var thkSel = $('thk'), mixSel = $('mix');
+  THICK.forEach(function (x, i) {
+    var o = document.createElement('option');
+    o.value = i; o.textContent = x.n;
+    if (i === 1) o.selected = true;
+    thkSel.appendChild(o);
+  });
+  MIXES.forEach(function (m, i) {
+    var o = document.createElement('option');
+    o.value = i; o.textContent = ratio(m) + ' (' + m.use + ')';
+    if (i === 0) o.selected = true;
+    mixSel.appendChild(o);
+  });
+
+  var tbody = $('tbody');
+  var rowEls = THICK.map(function (x, i) {
+    var tr = document.createElement('tr');
+    tr.tabIndex = 0; tr.dataset.i = i;
+    function pick() { thkSel.value = i; calc(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    tr.addEventListener('click', pick);
+    tr.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+    tbody.appendChild(tr);
+    return tr;
+  });
+
+  function calc() {
+    var ti = +thkSel.value, th = THICK[ti], m = MIXES[+mixSel.value];
+    var L = num('len', NaN), H = num('hgt', NaN), op = num('open', 0);
+    var wb = num('w-b', 0), wm = num('w-m', 0);
+    var pb = parseFloat(en($('p-b').value)), pc = parseFloat(en($('p-c').value)), ps = parseFloat(en($('p-s').value));
+
+    var msg = $('msg'), out = $('out');
+    var area = L * H;
+    var bad = !(L > 0) || !(H > 0) || isNaN(op) || op < 0 || op >= area || isNaN(wb) || wb < 0 || isNaN(wm) || wm < 0;
+
+    // table (uses current mix and wastage)
+    var tb = isNaN(wb) || wb < 0 ? 0 : wb, tm = isNaN(wm) || wm < 0 ? 0 : wm;
+    rowEls.forEach(function (tr, i) {
+      var q = quantities(100 * THICK[i].t / 12, m, tb, tm);
+      tr.innerHTML = '<td>' + THICK[i].n + '</td><td>' + fmt(Math.ceil(q.b1 - 1e-9), 0) + '</td><td>' + fmt(q.bags, 1) + '</td><td>' + fmt(q.sand, 1) + '</td>';
+      tr.classList.toggle('sel', i === ti);
+    });
+
+    if (bad) {
+      msg.hidden = false;
+      msg.textContent = 'লম্বা ও উচ্চতায় ০ এর বেশি সংখ্যা লিখুন। দরজা-জানালার ক্ষেত্রফল দেয়ালের ক্ষেত্রফলের কম হতে হবে। ওয়েস্টেজ ০ বা তার বেশি হতে হবে।';
+      out.hidden = true;
+      return;
+    }
+    msg.hidden = true; out.hidden = false;
+
+    var net = area - op;
+    var vol = net * th.t / 12;
+    var q = quantities(vol, m, wb, wm);
+    var bricks = Math.ceil(q.b1 - 1e-9);
+    var bagsBuy = Math.ceil(q.bags - 1e-9);
+
+    $('r-brick').textContent = fmt(bricks, 0);
+    $('r-eq').textContent = fmt(L, 2) + ' × ' + fmt(H, 2) + ' ফুট, ' + bn(th.t) + ' ইঞ্চি পুরু, মসলা ' + ratio(m);
+    $('t-b').textContent = fmt(bricks, 0);
+    $('t-c').textContent = fmt(q.bags, 1);
+    $('t-s').textContent = fmt(q.sand, 1);
+    $('r-area').textContent = fmt(area, 2) + ' বর্গফুট';
+    $('r-net').textContent = fmt(net, 2) + ' বর্গফুট';
+    $('r-vol').textContent = fmt(vol, 2) + ' সিএফটি';
+    $('r-m3').textContent = fmt(vol / M3, 3) + ' ঘনমিটার';
+    $('r-b0').textContent = fmt(Math.ceil(q.b0 - 1e-9), 0) + ' পিস';
+    $('r-b1').textContent = fmt(bricks, 0) + ' পিস';
+    $('r-wet').textContent = fmt(q.wet, 2) + ' সিএফটি';
+    $('r-dry').textContent = fmt(q.dry, 2) + ' সিএফটি';
+    $('r-bags').textContent = fmt(q.bags, 1) + ' ব্যাগ (কিনতে ' + bn(bagsBuy) + ' ব্যাগ)';
+    $('r-kg').textContent = fmt(q.bags * BAG_KG, 0) + ' কেজি';
+    $('r-sand').textContent = fmt(q.sand, 1) + ' সিএফটি';
+
+    var cr = $('cost-row');
+    if (pb > 0 || pc > 0 || ps > 0) {
+      var cost = (pb > 0 ? bricks * pb : 0) + (pc > 0 ? bagsBuy * pc : 0) + (ps > 0 ? q.sand * ps : 0);
+      cr.classList.add('on');
+      $('r-cost').textContent = '৳ ' + fmt(cost, 0);
+    } else {
+      cr.classList.remove('on');
+    }
+
+    $('wall').style.width = (th.t / 15 * 100) + '%';
+    $('wall-cap').textContent = 'দেয়ালের পুরুত্ব ' + bn(th.t) + ' ইঞ্চি (পাশ থেকে দেখলে)';
+  }
+
+  ['thk', 'mix', 'len', 'hgt', 'open', 'w-b', 'w-m', 'p-b', 'p-c', 'p-s'].forEach(function (id) {
+    $(id).addEventListener('input', calc);
+    $(id).addEventListener('change', calc);
+  });
+  calc();
+})();
+</script>
+
+</body></html>

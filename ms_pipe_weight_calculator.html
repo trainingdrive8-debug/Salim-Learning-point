@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MS Pipe Weight Calculator | Salim Construction</title>
+<style>
+:root{--navy:#12345a;--blue:#1769aa;--bg:#f3f6fa;--line:#d8e0ea;--green:#137a45}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,"Noto Sans Bengali",sans-serif;color:#1d2939}
+.wrap{max-width:980px;margin:24px auto;padding:16px}.head{background:linear-gradient(120deg,#12345a,#1976b9);color:#fff;padding:24px;border-radius:16px}
+h1{margin:0 0 8px;font-size:27px}.head p{margin:0;opacity:.92}.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:16px;box-shadow:0 4px 14px #1d293910}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+label{display:block;font-weight:700;font-size:14px;margin-bottom:7px}input,select{width:100%;padding:12px;border:1px solid #c8d3df;border-radius:9px;font-size:16px;background:#fff}
+small{display:block;color:#667085;margin-top:5px;line-height:1.4}
+button{border:0;border-radius:9px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer;margin:12px 8px 0 0}
+.primary{background:var(--blue);color:white}.secondary{background:#e8eef5;color:#12345a}
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:16px}
+.result{background:#f0f7ff;border:1px solid #d4e8fb;border-radius:11px;padding:14px}.result span{display:block;color:#475467;font-size:13px}.result strong{display:block;font-size:22px;color:#12345a;margin-top:6px}
+.formula{background:#f7f9fc;border-left:4px solid var(--green);padding:14px;border-radius:8px;line-height:1.8;overflow-wrap:anywhere}
+.note{font-size:13px;color:#667085;line-height:1.6}
+@media print{body{background:#fff}.wrap{margin:0;max-width:none}.head{background:#fff;color:#000;border:1px solid #aaa}.panel{box-shadow:none;break-inside:avoid}button{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="head">
+<h1>MS Pipe ওজন হিসাব ক্যালকুলেটর</h1>
+<p>পাইপের বাইরের ব্যাস, পুরুত্ব (Thickness), দৈর্ঘ্য ও পরিমাণ অনুযায়ী আনুমানিক ওজন বের করুন</p>
+</header>
+
+<section class="panel">
+<h2>পাইপের তথ্য দিন</h2>
+<div class="grid">
+<div><label for="diameter">বাইরের ব্যাস (Outside Diameter / OD)</label><input id="diameter" type="number" min="0" step="any" value="৫০" placeholder="যেমন: ৫০"><small>মিলিমিটার (mm)</small></div>
+<div><label for="thickness">পুরুত্ব (Thickness)</label><input id="thickness" type="number" min="0" step="any" value="২" placeholder="যেমন: ২"><small>মিলিমিটার (mm)</small></div>
+<div><label for="length">প্রতি পাইপের দৈর্ঘ্য</label><input id="length" type="number" min="0" step="any" value="২০" placeholder="যেমন: ২০"></div>
+<div><label for="lengthUnit">দৈর্ঘ্যের একক</label><select id="lengthUnit"><option value="ft" selected>ফুট (ft)</option><option value="m">মিটার (m)</option><option value="in">ইঞ্চি (inch)</option></select></div>
+<div><label for="qty">পাইপের সংখ্যা</label><input id="qty" type="number" min="1" step="1" value="1"></div>
+<div><label for="waste">অপচয় / অতিরিক্ত (%)</label><input id="waste" type="number" min="0" step="any" value="0"></div>
+<div><label for="density">MS-এর ঘনত্ব (Density)</label><input id="density" type="number" min="1" step="any" value="7850"><small>kg/m³ — সাধারণত ৭৮৫০ ধরা হয়</small></div>
+</div>
+<button class="primary" onclick="calculate()">হিসাব করুন</button><button class="secondary" onclick="resetForm()">রিসেট</button><button class="secondary" onclick="window.print()">প্রিন্ট / PDF</button>
+<div id="error" style="color:#b42318;font-weight:bold;margin-top:10px"></div>
+<div class="results" aria-live="polite">
+<div class="result"><span>প্রতি মিটারে ওজন</span><strong id="kgm">— kg/m</strong></div>
+<div class="result"><span>প্রতি ফুটে ওজন</span><strong id="kgft">— kg/ft</strong></div>
+<div class="result"><span>প্রতি পাইপের ওজন</span><strong id="one">— kg</strong></div>
+<div class="result"><span>মোট ওজন (অপচয়সহ)</span><strong id="total">— kg</strong></div>
+</div>
+</section>
+
+<section class="panel">
+<h2>MS Pipe ওজন বের করার সূত্র</h2>
+<div class="formula">
+<strong>১) সঠিক জ্যামিতিক সূত্র:</strong><br>
+ওজন (kg/m) = π ÷ 4 × [OD² − ID²] × Density ÷ 1,000,000<br>
+যেখানে, ID = OD − (2 × Thickness); OD ও ID মিলিমিটারে, Density kg/m³।<br><br>
+<strong>২) দ্রুত হিসাবের আনুমানিক সূত্র (MS Density = ৭৮৫০ kg/m³):</strong><br>
+ওজন (kg/m) ≈ 0.02466 × Thickness × (OD − Thickness)<br><br>
+<strong>৩) প্রতি ফুটের ওজন:</strong> kg/m × 0.3048<br>
+<strong>৪) মোট ওজন:</strong> kg/m × মোট দৈর্ঘ্য (মিটার) × পাইপের সংখ্যা × (1 + অপচয়% ÷ 100)
+</div>
+<p class="note">উদাহরণ: OD = ৫০ mm, Thickness = ২ mm হলে ID = ৪৬ mm। আনুমানিক ওজন ≈ 0.02466 × 2 × (50 − 2) = 2.367 kg/m।</p>
+</section>
+<section class="panel">
+<h2>গুরুত্বপূর্ণ নির্দেশনা</h2>
+<ul class="note">
+<li>এখানে OD বলতে পাইপের বাইরের ব্যাস বোঝায়; Nominal Bore (NB) বা নামমাত্র সাইজ নয়।</li>
+<li>প্রস্তুতকারকের প্রকৃত পুরুত্ব, tolerance, coating এবং material grade অনুযায়ী বাস্তব ওজন কিছুটা কম-বেশি হতে পারে।</li>
+<li>গ্যালভানাইজড/পেইন্ট করা পাইপের coating-এর ওজন এই হিসাবে আলাদা যোগ করা হয়নি।</li>
+<li>ক্রয় বা বিল প্রস্তুতের আগে সরবরাহকারীর weight chart অথবা weighbridge-এর ওজন যাচাই করুন।</li>
+</ul>
+</section>
+<footer class="note" style="text-align:center;padding:18px">Salim Construction & Engineering Calculator</footer>
+</div>
+<script>
+function n(id){return Number(document.getElementById(id).value)}
+function fmt(x,d=3){return Number(x).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function calculate(){
+ const D=n('diameter'),t=n('thickness'),L=n('length'),q=n('qty'),w=n('waste'),rho=n('density'),u=document.getElementById('lengthUnit').value;
+ const err=document.getElementById('error');err.textContent='';
+ if(!(D>0&&t>0&&t*2<D&&L>0&&q>0&&w>=0&&rho>0)){err.textContent='সঠিক মান দিন। OD ও Thickness শূন্যের বেশি হতে হবে এবং 2 × Thickness, OD-এর চেয়ে কম হতে হবে।';return}
+ const id=D-2*t;
+ const area=Math.PI/4*(D*D-id*id); // mm2
+ const kgm=area/1e6*rho;
+ const kgft=kgm*.3048;
+ let lm=L*(u==='ft'?.3048:u==='in'?.0254:1);
+ const one=kgm*lm;
+ const total=one*q*(1+w/100);
+ document.getElementById('kgm').textContent=fmt(kgm)+' kg/m';
+ document.getElementById('kgft').textContent=fmt(kgft)+' kg/ft';
+ document.getElementById('one').textContent=fmt(one)+' kg';
+ document.getElementById('total').textContent=fmt(total)+' kg';
+}
+function resetForm(){document.getElementById('diameter').value=50;document.getElementById('thickness').value=2;document.getElementById('length').value=20;document.getElementById('lengthUnit').value='ft';document.getElementById('qty').value=1;document.getElementById('waste').value=0;document.getElementById('density').value=7850;calculate()}
+calculate();
+</script>
+</body>
+</html>

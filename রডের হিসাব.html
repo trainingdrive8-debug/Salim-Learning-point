@@ -1,0 +1,316 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>রডের হিসাব</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>
+  /* Layout: input panel left, live result panel right; stacks to one column on phones. Table of all sizes below. */
+  :root {
+    --bg: #eef1f4;
+    --surface: #ffffff;
+    --surface-2: #e3e8ee;
+    --fg: #17202a;
+    --muted: #5b6876;
+    --line: #cfd7e0;
+    --accent: #0b6e99;
+    --accent-ink: #ffffff;
+    --accent-soft: #d6ebf5;
+    --rib: #8a97a6;
+    --font: "Hind Siliguri", "Noto Sans Bengali", "Kalpurush", "Nirmala UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171d;
+      --surface: #1b232c;
+      --surface-2: #26313d;
+      --fg: #e8edf2;
+      --muted: #9aa8b6;
+      --line: #33404d;
+      --accent: #5cc0ec;
+      --accent-ink: #0b1620;
+      --accent-soft: #1d3a4a;
+      --rib: #6f7f90;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12171d;
+    --surface: #1b232c;
+    --surface-2: #26313d;
+    --fg: #e8edf2;
+    --muted: #9aa8b6;
+    --line: #33404d;
+    --accent: #5cc0ec;
+    --accent-ink: #0b1620;
+    --accent-soft: #1d3a4a;
+    --rib: #6f7f90;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.55;
+    padding-block: 24px 40px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0; font-weight: 700; text-wrap: balance; }
+  .sub { color: var(--muted); margin: 4px 0 0; }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px; align-items: start; }
+  @media (max-width: 760px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; min-width: 0; }
+  .panel h2 { font-size: 0.85rem; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; margin: 0 0 14px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .field:last-of-type { margin-bottom: 0; }
+  label { font-weight: 600; font-size: 0.95rem; }
+  .hint { color: var(--muted); font-size: 0.82rem; font-weight: 400; }
+  select, input {
+    font: inherit; color: var(--fg); background: var(--bg);
+    border: 1.5px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; width: 100%; min-height: 46px;
+  }
+  select:focus-visible, input:focus-visible, button:focus-visible, tr[tabindex]:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 1px; border-color: var(--accent);
+  }
+  .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .opt { margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--line); }
+
+  /* result */
+  .hero { display: flex; flex-direction: column; gap: 2px; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .hero .k { color: var(--muted); font-size: 0.9rem; }
+  .hero .v { font-size: 2.6rem; font-weight: 700; line-height: 1.15; color: var(--accent); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .hero .v small { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin-left: 6px; }
+  .hero .eq { color: var(--muted); font-size: 0.9rem; }
+
+  .bar-wrap { overflow: hidden; border-radius: 6px; background: var(--surface-2); padding: 12px 10px; margin-bottom: 16px; }
+  .bar {
+    height: 14px; border-radius: 7px; background: var(--rib);
+    background-image: repeating-linear-gradient(105deg, transparent 0 9px, rgba(255,255,255,0.28) 9px 11px);
+    transition: height .2s ease;
+  }
+  .bar-cap { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 0.8rem; margin-top: 8px; }
+
+  dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 20px; margin: 0; }
+  @media (max-width: 460px) { dl { grid-template-columns: minmax(0, 1fr); } }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); min-width: 0; }
+  .row dt { color: var(--muted); font-size: 0.92rem; }
+  .row dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+  .row.strong dd { color: var(--accent); }
+  .cost { display: none; }
+  .cost.on { display: flex; }
+  .err { color: #b3261e; font-weight: 600; }
+  :root[data-theme="dark"] .err { color: #ff8a80; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .err { color: #ff8a80; } }
+
+  /* table */
+  .tbl { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 520px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 0.82rem; color: var(--muted); font-weight: 600; background: var(--surface-2); }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: var(--surface-2); }
+  tbody tr.sel { background: var(--accent-soft); font-weight: 600; }
+  .note { color: var(--muted); font-size: 0.85rem; margin: 12px 0 0; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>রডের হিসাব</h1>
+    <p class="sub">রডের সাইজ আর লম্বা (ফুট) দিন। ওজন, দৈর্ঘ্য ও রডের সংখ্যা নিচে সাথে সাথে দেখাবে।</p>
+  </header>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="in-h">
+      <h2 id="in-h">ইনপুট</h2>
+      <div class="field">
+        <label for="size">রডের সাইজ</label>
+        <select id="size"></select>
+      </div>
+      <div class="field">
+        <label for="len">লম্বা (ফুট) <span class="hint">মোট কত ফুট রড</span></label>
+        <input id="len" type="text" inputmode="decimal" value="40" autocomplete="off">
+      </div>
+      <div class="opt">
+        <div class="pair">
+          <div class="field">
+            <label for="qty">পিস সংখ্যা <span class="hint">ঐচ্ছিক</span></label>
+            <input id="qty" type="text" inputmode="numeric" value="1" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="price">দর (টাকা/কেজি) <span class="hint">ঐচ্ছিক</span></label>
+            <input id="price" type="text" inputmode="decimal" placeholder="যেমন ৯৫" autocomplete="off">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="out-h" aria-live="polite">
+      <h2 id="out-h">ফলাফল</h2>
+      <div id="msg" class="err" hidden></div>
+      <div id="out">
+        <div class="hero">
+          <span class="k">মোট ওজন</span>
+          <span class="v"><span id="r-kg">০</span><small>কেজি</small></span>
+          <span class="eq" id="r-eq"></span>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar" id="bar"></div>
+          <div class="bar-cap"><span id="bar-l"></span><span id="bar-r"></span></div>
+        </div>
+        <dl>
+          <div class="row"><dt>রডের ব্যাস</dt><dd id="r-d"></dd></div>
+          <div class="row"><dt>প্রতি ফুটে ওজন</dt><dd id="r-wft"></dd></div>
+          <div class="row"><dt>প্রতি মিটারে ওজন</dt><dd id="r-wm"></dd></div>
+          <div class="row"><dt>মোট দৈর্ঘ্য (ফুট)</dt><dd id="r-ft"></dd></div>
+          <div class="row"><dt>মোট দৈর্ঘ্য (মিটার)</dt><dd id="r-m"></dd></div>
+          <div class="row"><dt>ক্রস-সেকশন ক্ষেত্রফল</dt><dd id="r-a"></dd></div>
+          <div class="row"><dt>মোট ওজন (পাউন্ড)</dt><dd id="r-lb"></dd></div>
+          <div class="row"><dt>মোট ওজন (টন)</dt><dd id="r-t"></dd></div>
+          <div class="row strong"><dt>৪০ ফুটের রড লাগবে</dt><dd id="r-bars"></dd></div>
+          <div class="row"><dt>প্রতি ৪০ ফুট রডের ওজন</dt><dd id="r-w40"></dd></div>
+          <div class="row cost strong" id="cost-row"><dt>আনুমানিক খরচ</dt><dd id="r-cost"></dd></div>
+        </dl>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="tb-h">
+    <h2 id="tb-h">সব সাইজের ওজন (যেকোনো সারিতে চাপ দিলে সেই সাইজ নির্বাচিত হবে)</h2>
+    <div class="tbl">
+      <table>
+        <thead>
+          <tr><th>সাইজ</th><th>ব্যাস (ইঞ্চি)</th><th>কেজি/ফুট</th><th>কেজি/মিটার</th><th>কেজি/৪০ ফুট</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="note">সূত্র: ওজন (কেজি/মিটার) = ব্যাস² ÷ ১৬২, ব্যাস মিলিমিটারে। ১ ফুট = ০.৩০৪৮ মিটার। বাজারের রডে সামান্য কম-বেশি ওজন হতে পারে, তাই হিসাবটি আনুমানিক ধরুন।</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  var SIZES = [
+    { d: 6,  n: '#২' },
+    { d: 8,  n: '' },
+    { d: 10, n: '#৩' },
+    { d: 12, n: '#৪' },
+    { d: 16, n: '#৫' },
+    { d: 20, n: '#৬' },
+    { d: 22, n: '#৭' },
+    { d: 25, n: '#৮' },
+    { d: 28, n: '#৯' },
+    { d: 32, n: '#১০' },
+    { d: 36, n: '#১১' },
+    { d: 40, n: '' }
+  ];
+  var FT = 0.3048, BAR_FT = 40;
+  var BN = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+
+  function $(id) { return document.getElementById(id); }
+  function bn(s) { return String(s).replace(/[0-9]/g, function (c) { return BN[+c]; }); }
+  function en(s) {
+    return String(s).replace(/[০-৯]/g, function (c) { return BN.indexOf(c); })
+      .replace(/৷|,|،/g, '.').trim();
+  }
+  function fmt(n, dp) {
+    var s = (+n).toFixed(dp);
+    if (s.indexOf('.') > -1) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    var parts = s.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return bn(parts.join('.'));
+  }
+  function label(s) { return bn(s.d) + ' মিমি' + (s.n ? ' (' + s.n + ')' : ''); }
+  function wM(d) { return d * d / 162; }
+
+  var sel = $('size');
+  SIZES.forEach(function (s) {
+    var o = document.createElement('option');
+    o.value = s.d; o.textContent = label(s);
+    if (s.d === 12) o.selected = true;
+    sel.appendChild(o);
+  });
+
+  var tbody = $('tbody');
+  SIZES.forEach(function (s) {
+    var tr = document.createElement('tr');
+    tr.tabIndex = 0;
+    tr.dataset.d = s.d;
+    var wm = wM(s.d), wf = wm * FT;
+    tr.innerHTML = '<td>' + label(s) + '</td><td>' + fmt(s.d / 25.4, 3) + '</td><td>' + fmt(wf, 3) +
+      '</td><td>' + fmt(wm, 3) + '</td><td>' + fmt(wf * BAR_FT, 2) + '</td>';
+    function pick() { sel.value = s.d; calc(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    tr.addEventListener('click', pick);
+    tr.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+    tbody.appendChild(tr);
+  });
+
+  function calc() {
+    var d = +sel.value;
+    var len = parseFloat(en($('len').value));
+    var qtyRaw = en($('qty').value);
+    var qty = qtyRaw === '' ? 1 : parseFloat(qtyRaw);
+    var price = parseFloat(en($('price').value));
+
+    Array.prototype.forEach.call(tbody.children, function (tr) {
+      tr.classList.toggle('sel', +tr.dataset.d === d);
+    });
+
+    var msg = $('msg'), out = $('out');
+    if (!(len > 0) || !(qty > 0)) {
+      msg.hidden = false;
+      msg.textContent = 'লম্বা ও পিস সংখ্যায় ০ এর বেশি একটি সংখ্যা লিখুন।';
+      out.hidden = true;
+      return;
+    }
+    msg.hidden = true; out.hidden = false;
+
+    var wm = wM(d), wf = wm * FT;
+    var totFt = len * qty;
+    var kg = wf * totFt;
+    var bars = totFt / BAR_FT;
+
+    $('r-kg').textContent = fmt(kg, 2);
+    $('r-eq').textContent = (qty !== 1 ? fmt(qty, 2) + ' পিস × ' : '') + fmt(len, 2) + ' ফুট × ' + fmt(wf, 3) + ' কেজি/ফুট';
+    $('r-d').textContent = bn(d) + ' মিমি (' + fmt(d / 25.4, 3) + ' ইঞ্চি)';
+    $('r-wft').textContent = fmt(wf, 3) + ' কেজি';
+    $('r-wm').textContent = fmt(wm, 3) + ' কেজি';
+    $('r-ft').textContent = fmt(totFt, 2) + ' ফুট';
+    $('r-m').textContent = fmt(totFt * FT, 2) + ' মিটার';
+    $('r-a').textContent = fmt(Math.PI * d * d / 4, 1) + ' বর্গ মিমি';
+    $('r-lb').textContent = fmt(kg * 2.20462, 2) + ' পাউন্ড';
+    $('r-t').textContent = fmt(kg / 1000, 4) + ' টন';
+    $('r-bars').textContent = fmt(bars, 2) + ' টি (পূর্ণ ' + bn(Math.ceil(bars - 1e-9)) + ' টি কিনতে হবে)';
+    $('r-w40').textContent = fmt(wf * BAR_FT, 2) + ' কেজি';
+
+    var cr = $('cost-row');
+    if (price > 0) {
+      cr.classList.add('on');
+      $('r-cost').textContent = '৳ ' + fmt(kg * price, 0);
+    } else {
+      cr.classList.remove('on');
+    }
+
+    $('bar').style.height = Math.max(8, Math.min(34, d * 0.85)) + 'px';
+    $('bar-l').textContent = bn(d) + ' মিমি রড';
+    $('bar-r').textContent = fmt(len, 2) + ' ফুট';
+  }
+
+  ['size', 'len', 'qty', 'price'].forEach(function (id) {
+    $(id).addEventListener('input', calc);
+    $(id).addEventListener('change', calc);
+  });
+  calc();
+})();
+</script>
+
+</body></html>
