@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>সিলিং প্লাস্টার ক্যালকুলেটর - Salim Learning Point</title>
+<meta name="description" content="সিলিং প্লাস্টারের ক্ষেত্রফল, মসলার আয়তন, সিমেন্ট ও বালুর পরিমাণ হিসাবের ক্যালকুলেটর, সূত্র ও উদাহরণ।">
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 12px;
+  font-family: Arial, "Noto Sans Bengali", sans-serif;
+  background: #f1f6fc;
+  color: #1f2d3d;
+}
+
+.wrap { max-width: 850px; margin: 10px auto; }
+
+.header {
+  padding: 30px 18px;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(135deg,#063d82,#078bd0);
+  border-radius: 20px 20px 0 0;
+}
+.header .back {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  background: rgba(255,255,255,.18);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+.header .icon { font-size: 44px; }
+.header h1 { margin: 6px 0; font-size: 28px; }
+.header p { margin: 6px 0 0; font-size: 15px; line-height: 1.7; }
+
+.card {
+  background: #fff;
+  padding: 22px 20px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(0,0,0,.08);
+}
+.header + .card { border-radius: 0 0 16px 16px; }
+
+h2 { margin: 0 0 14px; font-size: 21px; color: #0756a5; }
+h3 { margin: 18px 0 8px; font-size: 17px; color: #0756a5; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.tab {
+  flex: 1 1 160px;
+  padding: 11px 10px;
+  border: 1px solid #cfdcec;
+  background: #f5f9fd;
+  color: #24496e;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.tab.active { background: #0756a5; color: #fff; border-color: #0756a5; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 14px; }
+label { display: block; font-size: 14px; font-weight: bold; color: #24496e; margin-bottom: 5px; }
+.hint { font-size: 12px; color: #6b7a8c; margin-top: 4px; font-weight: normal; }
+input, select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #c4d3e6;
+  border-radius: 9px;
+  font-size: 16px;
+  background: #fff;
+}
+input:focus, select:focus { outline: 2px solid #078bd0; border-color: #078bd0; }
+.row2 { display: flex; gap: 8px; }
+.row2 input { flex: 2; }
+.row2 select { flex: 1; }
+
+.sub { margin-top: 18px; padding-top: 14px; border-top: 1px dashed #cfdcec; }
+
+.btn {
+  display: inline-block;
+  padding: 13px 24px;
+  margin-top: 16px;
+  color: #fff;
+  background: linear-gradient(135deg,#0875cb,#0756a5);
+  border: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.btn:hover { background: #06447f; }
+.btn.gray { background: #64748b; margin-left: 8px; }
+
+.result { display: none; margin-top: 18px; }
+.result.show { display: block; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit,minmax(170px,1fr)); gap: 10px; }
+.stat {
+  padding: 14px 10px;
+  text-align: center;
+  background: #eef6ff;
+  border: 1px solid #d3e4f7;
+  border-radius: 12px;
+}
+.stat .v { font-size: 22px; font-weight: bold; color: #063d82; }
+.stat .l { font-size: 13px; color: #596779; margin-top: 4px; }
+.stat.hl { background: #e5f8ed; border-color: #bfe8cf; }
+.stat.hl .v { color: #128348; }
+.stat.cost { background: #fff3c4; border-color: #f0dc8a; }
+.stat.cost .v { color: #8a5a00; }
+.steps {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: #fffbea;
+  border: 1px solid #f3e3a1;
+  border-radius: 12px;
+  font-size: 14.5px;
+  line-height: 1.9;
+}
+.err { margin-top: 14px; color: #b42318; font-weight: bold; }
+
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+th, td { padding: 9px 8px; text-align: center; border-bottom: 1px solid #e2eaf3; }
+th { background: #0756a5; color: #fff; }
+tr:nth-child(even) td { background: #f5f9fd; }
+tr.pick td { background: #fff3c4 !important; font-weight: bold; }
+
+.formula {
+  margin: 10px 0;
+  padding: 14px 16px;
+  background: #f5f9fd;
+  border-left: 5px solid #078bd0;
+  border-radius: 8px;
+  line-height: 1.9;
+  font-size: 15px;
+}
+.formula b { color: #063d82; }
+.formula code { background: #fff; padding: 2px 7px; border: 1px solid #d3e4f7; border-radius: 5px; font-size: 15px; }
+
+.note {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 10px;
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: #7c4a03;
+}
+
+.footer {
+  padding: 18px;
+  text-align: center;
+  color: #fff;
+  background: #102e50;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+@media(max-width:600px) {
+  body { padding: 4px; }
+  .header h1 { font-size: 23px; }
+  .card { padding: 18px 13px; }
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <a class="back" href="index.html">← মূল পেজে ফিরুন</a>
+    <div class="icon">🧱</div>
+    <h1>সিলিং প্লাস্টার ক্যালকুলেটর</h1>
+    <p>সিলিংয়ের ক্ষেত্রফল, মসলার আয়তন, সিমেন্ট ও বালুর পরিমাণ হিসাব করুন</p>
+  </div>
+
+  <!-- CALCULATOR -->
+  <div class="card">
+    <h2>🧮 ক্যালকুলেটর</h2>
+
+    <div class="tabs">
+      <button class="tab active" data-mode="M">রুমের মাপ দিয়ে</button>
+      <button class="tab" data-mode="A">সরাসরি ক্ষেত্রফল দিয়ে</button>
+    </div>
+
+    <div class="grid">
+      <div id="boxM1">
+        <label for="len">সিলিংয়ের দৈর্ঘ্য</label>
+        <div class="row2">
+          <input id="len" type="number" min="0" step="any" value="14">
+          <select id="unit">
+            <option value="ft" selected>ফুট</option>
+            <option value="m">মিটার</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="boxM2">
+        <label for="wid">সিলিংয়ের প্রস্থ</label>
+        <input id="wid" type="number" min="0" step="any" value="12">
+        <div class="hint">একক উপরের মতোই (ফুট বা মিটার)</div>
+      </div>
+
+      <div id="boxA" style="display:none">
+        <label for="areaDirect">মোট ক্ষেত্রফল (বর্গফুট)</label>
+        <input id="areaDirect" type="number" min="0" step="any" value="168">
+      </div>
+
+      <div>
+        <label for="extra">অতিরিক্ত ক্ষেত্রফল (বর্গফুট)</label>
+        <input id="extra" type="number" min="0" step="any" value="0">
+        <div class="hint">যেমন বিমের পাশ, কার্নিশ (না থাকলে ০)</div>
+      </div>
+
+      <div>
+        <label for="thick">প্লাস্টারের পুরুত্ব (মিমি)</label>
+        <input id="thick" type="number" min="1" step="any" value="12">
+        <div class="hint">সিলিংয়ে সাধারণত ১০–১২ মিমি ধরা হয়</div>
+      </div>
+
+      <div>
+        <label for="ratio">মিশ্রণের অনুপাত (সিমেন্ট : বালু)</label>
+        <select id="ratio">
+          <option value="3">১ : ৩</option>
+          <option value="4" selected>১ : ৪</option>
+          <option value="5">১ : ৫</option>
+          <option value="6">১ : ৬</option>
+        </select>
+        <div class="hint">সিলিংয়ে সাধারণত ১:৩ বা ১:৪</div>
+      </div>
+    </div>
+
+    <div class="sub">
+      <h3 style="margin-top:0">⚙️ ধ্রুবক (প্রয়োজনে বদলান)</h3>
+      <div class="grid">
+        <div>
+          <label for="dryF">শুকনো আয়তনের গুণক</label>
+          <input id="dryF" type="number" min="1" step="0.01" value="1.27">
+          <div class="hint">ভেজা থেকে শুকনো আয়তন (সাধারণত ১.২৭)</div>
+        </div>
+        <div>
+          <label for="waste">অপচয় (%)</label>
+          <input id="waste" type="number" min="0" step="any" value="5">
+        </div>
+        <div>
+          <label for="bagCft">১ ব্যাগ সিমেন্টের আয়তন (ঘনফুট)</label>
+          <input id="bagCft" type="number" min="0.1" step="0.01" value="1.25">
+          <div class="hint">৫০ কেজির ব্যাগ ≈ ১.২৫ ঘনফুট</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub">
+      <h3 style="margin-top:0">💰 খরচ (ঐচ্ছিক)</h3>
+      <div class="grid">
+        <div>
+          <label for="rCement">সিমেন্টের দাম (টাকা/ব্যাগ)</label>
+          <input id="rCement" type="number" min="0" step="any" placeholder="যেমন 550">
+        </div>
+        <div>
+          <label for="rSand">বালুর দাম (টাকা/ঘনফুট)</label>
+          <input id="rSand" type="number" min="0" step="any" placeholder="যেমন 40">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn" id="calcBtn">হিসাব করুন</button>
+    <button class="btn gray" id="resetBtn">রিসেট</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="card">
+    <h2>📋 প্রতি ১০০ বর্গফুটে মালামাল</h2>
+    <p style="margin:0 0 10px;font-size:14px;color:#596779" id="tblNote"></p>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>অনুপাত</th>
+            <th>সিমেন্ট (ব্যাগ)</th>
+            <th>সিমেন্ট (কেজি)</th>
+            <th>বালু (ঘনফুট)</th>
+          </tr>
+        </thead>
+        <tbody id="tblBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FORMULA -->
+  <div class="card">
+    <h2>📐 সূত্র</h2>
+
+    <div class="formula">
+      <b>১. সিলিংয়ের ক্ষেত্রফল:</b><br>
+      <code>ক্ষেত্রফল (বর্গফুট) = দৈর্ঘ্য (ফুট) × প্রস্থ (ফুট)</code><br>
+      মিটারে মাপ থাকলে: <code>১ বর্গমিটার = ১০.৭৬৪ বর্গফুট</code>
+    </div>
+
+    <div class="formula">
+      <b>২. পুরুত্ব ফুটে রূপান্তর:</b><br>
+      <code>পুরুত্ব (ফুট) = পুরুত্ব (মিমি) ÷ ৩০৪.৮</code>
+    </div>
+
+    <div class="formula">
+      <b>৩. ভেজা আয়তন (অপচয় সহ):</b><br>
+      <code>ভেজা আয়তন (ঘনফুট) = ক্ষেত্রফল × পুরুত্ব (ফুট) × (১ + অপচয় ÷ ১০০)</code>
+    </div>
+
+    <div class="formula">
+      <b>৪. শুকনো আয়তন:</b><br>
+      <code>শুকনো আয়তন = ভেজা আয়তন × শুকনো গুণক (১.২৭)</code><br>
+      (মসলা বানাতে শুকনো উপকরণের আয়তন ভেজা আয়তনের চেয়ে বেশি লাগে)
+    </div>
+
+    <div class="formula">
+      <b>৫. সিমেন্ট ও বালু (অনুপাত ১ : S):</b><br>
+      <code>সিমেন্টের আয়তন = শুকনো আয়তন × ১ ÷ (১ + S)</code><br>
+      <code>বালুর আয়তন = শুকনো আয়তন × S ÷ (১ + S)</code>
+    </div>
+
+    <div class="formula">
+      <b>৬. সিমেন্টের ব্যাগ:</b><br>
+      <code>ব্যাগ = সিমেন্টের আয়তন (ঘনফুট) ÷ ১.২৫</code><br>
+      <code>সিমেন্ট (কেজি) = ব্যাগ × ৫০</code>
+    </div>
+
+    <h3>উদাহরণ</h3>
+    <div class="formula">
+      ১৪ ফুট × ১২ ফুট সিলিং, পুরুত্ব ১২ মিমি, অনুপাত ১:৪, অপচয় ৫%।<br>
+      ১) ক্ষেত্রফল = ১৪ × ১২ = <b>১৬৮ বর্গফুট</b><br>
+      ২) পুরুত্ব = ১২ ÷ ৩০৪.৮ = ০.০৩৯৪ ফুট<br>
+      ৩) ভেজা আয়তন = ১৬৮ × ০.০৩৯৪ × ১.০৫ = <b>৬.৯৪ ঘনফুট</b><br>
+      ৪) শুকনো আয়তন = ৬.৯৪ × ১.২৭ = <b>৮.৮২ ঘনফুট</b><br>
+      ৫) সিমেন্ট = ৮.৮২ ÷ ৫ = ১.৭৬ ঘনফুট, বালু = ৮.৮২ × ৪ ÷ ৫ = <b>৭.০৬ ঘনফুট</b><br>
+      ৬) সিমেন্ট ব্যাগ = ১.৭৬ ÷ ১.২৫ = <b>প্রায় ১.৪১ ব্যাগ</b> (≈ ৭০.৬ কেজি)
+    </div>
+
+    <div class="note">
+      ⚠️ এটি সূত্র ধরে করা আনুমানিক হিসাব। বালুর মান, পানির পরিমাণ, মিস্ত্রির কাজের ধরন ও সিলিংয়ের সমতলের ওপর বাস্তব মালামাল কিছুটা কম-বেশি হতে পারে। বড় কাজে প্রকৌশলী বা অভিজ্ঞ মিস্ত্রির পরামর্শ নিন।
+    </div>
+  </div>
+
+  <div class="footer">
+    © Salim Learning Point<br>
+    Learn • Practice • Build Your Skills
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var SQFT_PER_SQM = 10.7639;
+  var MM_PER_FT = 304.8;
+  var mode = 'M';
+  var $ = function (id) { return document.getElementById(id); };
+  var bn = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+
+  function fmt(n, d) {
+    if (d === undefined) d = 2;
+    return Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  }
+  function num(id) { return parseFloat($(id).value); }
+
+  var tabs = document.querySelectorAll('.tab');
+  Array.prototype.forEach.call(tabs, function (t) {
+    t.addEventListener('click', function () {
+      Array.prototype.forEach.call(tabs, function (x) { x.classList.remove('active'); });
+      t.classList.add('active');
+      mode = t.getAttribute('data-mode');
+      $('boxM1').style.display = mode === 'M' ? '' : 'none';
+      $('boxM2').style.display = mode === 'M' ? '' : 'none';
+      $('boxA').style.display = mode === 'A' ? '' : 'none';
+      $('result').className = 'result';
+    });
+  });
+
+  function stat(v, l, cls) {
+    return '<div class="stat' + (cls ? ' ' + cls : '') + '"><div class="v">' + v + '</div><div class="l">' + l + '</div></div>';
+  }
+
+  // core: returns materials for a given area
+  function materials(area, thickMm, S, dryF, wastePct, bagCft) {
+    var thickFt = thickMm / MM_PER_FT;
+    var wet = area * thickFt * (1 + wastePct / 100);
+    var dry = wet * dryF;
+    var cementCft = dry / (1 + S);
+    var sandCft = dry * S / (1 + S);
+    var bags = cementCft / bagCft;
+    return { thickFt: thickFt, wet: wet, dry: dry, cementCft: cementCft, sandCft: sandCft, bags: bags, kg: bags * 50 };
+  }
+
+  function calc() {
+    var res = $('result');
+    var thick = num('thick'), S = parseInt($('ratio').value, 10);
+    var dryF = num('dryF'), waste = num('waste'), bagCft = num('bagCft');
+    var extra = num('extra'); if (isNaN(extra)) extra = 0;
+    if (!(thick > 0) || !(dryF > 0) || !(bagCft > 0) || isNaN(waste) || waste < 0 || extra < 0) {
+      res.innerHTML = '<div class="err">দয়া করে পুরুত্ব, ধ্রুবক ও অপচয়ের মান সঠিকভাবে দিন।</div>';
+      res.className = 'result show';
+      return;
+    }
+
+    var area, areaStep;
+    if (mode === 'M') {
+      var L = num('len'), W = num('wid');
+      if (!(L > 0) || !(W > 0)) {
+        res.innerHTML = '<div class="err">দৈর্ঘ্য ও প্রস্থ সঠিকভাবে দিন।</div>';
+        res.className = 'result show';
+        return;
+      }
+      if ($('unit').value === 'm') {
+        area = L * W * SQFT_PER_SQM;
+        areaStep = fmt(L, 2) + ' মি × ' + fmt(W, 2) + ' মি = ' + fmt(L * W, 2) + ' বর্গমিটার × 10.764 = <b>' + fmt(area, 2) + ' বর্গফুট</b>';
+      } else {
+        area = L * W;
+        areaStep = fmt(L, 2) + ' × ' + fmt(W, 2) + ' = <b>' + fmt(area, 2) + ' বর্গফুট</b>';
+      }
+    } else {
+      area = num('areaDirect');
+      if (!(area > 0)) {
+        res.innerHTML = '<div class="err">ক্ষেত্রফল সঠিকভাবে দিন।</div>';
+        res.className = 'result show';
+        return;
+      }
+      areaStep = '<b>' + fmt(area, 2) + ' বর্গফুট</b> (সরাসরি দেওয়া)';
+    }
+
+    var total = area + extra;
+    var m = materials(total, thick, S, dryF, waste, bagCft);
+
+    var steps = '';
+    steps += '১) ক্ষেত্রফল = ' + areaStep + '<br>';
+    if (extra > 0) steps += '   অতিরিক্ত ক্ষেত্রফল যোগ: ' + fmt(area, 2) + ' + ' + fmt(extra, 2) + ' = <b>' + fmt(total, 2) + ' বর্গফুট</b><br>';
+    steps += '২) পুরুত্ব = ' + fmt(thick, 1) + ' ÷ 304.8 = <b>' + fmt(m.thickFt, 4) + ' ফুট</b><br>';
+    steps += '৩) ভেজা আয়তন = ' + fmt(total, 2) + ' × ' + fmt(m.thickFt, 4) + ' × ' + fmt(1 + waste / 100, 2) + ' = <b>' + fmt(m.wet, 2) + ' ঘনফুট</b><br>';
+    steps += '৪) শুকনো আয়তন = ' + fmt(m.wet, 2) + ' × ' + fmt(dryF, 2) + ' = <b>' + fmt(m.dry, 2) + ' ঘনফুট</b><br>';
+    steps += '৫) সিমেন্ট = ' + fmt(m.dry, 2) + ' × 1 ÷ ' + (1 + S) + ' = <b>' + fmt(m.cementCft, 2) + ' ঘনফুট</b>; বালু = ' + fmt(m.dry, 2) + ' × ' + S + ' ÷ ' + (1 + S) + ' = <b>' + fmt(m.sandCft, 2) + ' ঘনফুট</b><br>';
+    steps += '৬) সিমেন্ট ব্যাগ = ' + fmt(m.cementCft, 2) + ' ÷ ' + fmt(bagCft, 2) + ' = <b>' + fmt(m.bags, 2) + ' ব্যাগ</b> (' + fmt(m.kg, 1) + ' কেজি)';
+
+    var html = '<div class="stats">' +
+      stat(fmt(total, 2) + ' sft', 'মোট ক্ষেত্রফল (' + fmt(total / SQFT_PER_SQM, 2) + ' বর্গমিটার)') +
+      stat(fmt(m.wet, 2) + ' cft', 'ভেজা আয়তন (অপচয় সহ)') +
+      stat(fmt(m.dry, 2) + ' cft', 'শুকনো আয়তন') +
+      stat(fmt(m.bags, 2) + ' ব্যাগ', 'সিমেন্ট (' + fmt(m.kg, 1) + ' কেজি)', 'hl') +
+      stat(fmt(m.sandCft, 2) + ' cft', 'বালু', 'hl') +
+      stat('প্রায় ' + Math.ceil(m.bags - 1e-9) + ' ব্যাগ', 'কেনার জন্য (পূর্ণ সংখ্যায়)', 'hl');
+
+    var rc = num('rCement'), rs = num('rSand');
+    var hasC = rc > 0, hasS = rs > 0;
+    if (hasC || hasS) {
+      var cost = 0;
+      if (hasC) cost += Math.ceil(m.bags - 1e-9) * rc;
+      if (hasS) cost += m.sandCft * rs;
+      html += stat(fmt(cost, 0) + ' ৳', 'আনুমানিক মালামাল খরচ' + (hasC && hasS ? '' : ' (শুধু দেওয়া দামের অংশ)'), 'cost');
+      steps += '<br>৭) খরচ = ' + (hasC ? Math.ceil(m.bags - 1e-9) + ' ব্যাগ × ' + fmt(rc, 0) : '') + (hasC && hasS ? ' + ' : '') + (hasS ? fmt(m.sandCft, 2) + ' ঘনফুট × ' + fmt(rs, 0) : '') + ' = <b>' + fmt(cost, 0) + ' টাকা</b>';
+    }
+    html += '</div><div class="steps"><b>ধাপে ধাপে হিসাব:</b><br>' + steps + '</div>';
+
+    res.innerHTML = html;
+    res.className = 'result show';
+    renderTable(S);
+  }
+
+  function renderTable(pickS) {
+    var thick = num('thick'), dryF = num('dryF'), waste = num('waste'), bagCft = num('bagCft');
+    if (!(thick > 0) || !(dryF > 0) || !(bagCft > 0) || isNaN(waste)) return;
+    var rows = '';
+    [3, 4, 5, 6].forEach(function (S) {
+      var m = materials(100, thick, S, dryF, waste, bagCft);
+      rows += '<tr class="' + (S === pickS ? 'pick' : '') + '"><td>১ : ' + bn[S] + '</td><td>' + fmt(m.bags, 2) + '</td><td>' + fmt(m.kg, 1) + '</td><td>' + fmt(m.sandCft, 2) + '</td></tr>';
+    });
+    $('tblBody').innerHTML = rows;
+    $('tblNote').textContent = 'পুরুত্ব ' + fmt(thick, 0) + ' মিমি, অপচয় ' + fmt(waste, 0) + '%, শুকনো গুণক ' + fmt(dryF, 2) + ' ধরে হিসাব।';
+  }
+
+  $('calcBtn').addEventListener('click', calc);
+  $('resetBtn').addEventListener('click', function () {
+    $('len').value = 14; $('wid').value = 12; $('unit').value = 'ft';
+    $('areaDirect').value = 168; $('extra').value = 0;
+    $('thick').value = 12; $('ratio').value = '4';
+    $('dryF').value = 1.27; $('waste').value = 5; $('bagCft').value = 1.25;
+    $('rCement').value = ''; $('rSand').value = '';
+    $('result').className = 'result';
+    renderTable(4);
+  });
+
+  ['thick', 'dryF', 'waste', 'bagCft'].forEach(function (id) {
+    $(id).addEventListener('input', function () { renderTable(parseInt($('ratio').value, 10)); });
+  });
+  $('ratio').addEventListener('change', function () { renderTable(parseInt(this.value, 10)); });
+
+  renderTable(4);
+})();
+</script>
+
+</body>
+</html>
