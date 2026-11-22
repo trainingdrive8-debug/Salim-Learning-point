@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Online Admission - Salim Learning Point</title>
+<meta name="description" content="Salim Learning Point Online Admission. Apply for your preferred training course.">
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 12px;
+  font-family: Arial, sans-serif;
+  background: #f1f6fc;
+}
+
+.admission-container {
+  width: 100%;
+  max-width: 750px;
+  margin: 15px auto;
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.10);
+}
+
+.admission-header {
+  padding: 35px 18px;
+  text-align: center;
+  color: white;
+  background: linear-gradient(135deg,#063d82,#078bd0);
+}
+
+.logo-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.admission-header h1 {
+  margin: 5px 0;
+  font-size: 29px;
+}
+
+.admission-header h2 {
+  margin: 12px 0;
+  font-size: 21px;
+  letter-spacing: 1px;
+}
+
+.admission-header p {
+  margin: 8px 0 0;
+  line-height: 1.7;
+  font-size: 15px;
+  color: white;
+}
+
+.admission-content {
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.status {
+  display: inline-block;
+  background: #e5f8ed;
+  color: #128348;
+  padding: 8px 18px;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.admission-content h2 {
+  color: #0756a5;
+  font-size: 23px;
+  margin: 8px 0 12px;
+}
+
+.admission-content p {
+  color: #596779;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.admission-button {
+  display: block;
+  max-width: 350px;
+  margin: 25px auto 10px;
+  padding: 17px 20px;
+  color: white;
+  background: linear-gradient(135deg,#0875cb,#0756a5);
+  text-decoration: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(7,86,165,.25);
+  transition: .25s;
+}
+
+.admission-button:hover {
+  transform: translateY(-3px);
+  background: #06447f;
+}
+
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.feature {
+  flex: 1 1 130px;
+  max-width: 190px;
+  padding: 15px 8px;
+  border: 1px solid #e2eaf3;
+  border-radius: 12px;
+  color: #24496e;
+  font-size: 14px;
+}
+
+.contact-area {
+  padding: 22px 15px;
+  text-align: center;
+  background: #f5f9fd;
+  line-height: 2;
+}
+
+.contact-area h3 {
+  color: #0756a5;
+  margin: 0 0 10px;
+}
+
+.contact-area a {
+  color: #0875cb;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.whatsapp-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #16a34a;
+  color: white !important;
+  border-radius: 25px;
+  margin-top: 8px;
+}
+
+.admission-footer {
+  padding: 18px;
+  text-align: center;
+  color: white;
+  background: #102e50;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+@media(max-width:600px) {
+  body {
+    padding: 3px;
+  }
+
+  .admission-container {
+    margin: 5px auto;
+    border-radius: 13px;
+  }
+
+  .admission-header {
+    padding: 27px 12px;
+  }
+
+  .admission-header h1 {
+    font-size: 23px;
+  }
+
+  .admission-content {
+    padding: 23px 13px;
+  }
+
+  .admission-content h2 {
+    font-size: 20px;
+  }
+
+  .admission-button {
+    font-size: 16px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="admission-container">
+
+  <div class="admission-header">
+    <div class="logo-icon">🎓</div>
+
+    <h1>Salim Learning Point</h1>
+
+    <h2>ONLINE ADMISSION</h2>
+
+    <p>
+      দক্ষতা অর্জন করুন<br>
+      নিজের ভবিষ্যৎ গড়ে তুলুন
+    </p>
+  </div>
+
+  <div class="admission-content">
+
+    <div class="status">
+      ● ভর্তি আবেদন চালু
+    </div>
+
+    <h2>অনলাইন ভর্তি কার্যক্রম</h2>
+
+    <p>
+      Salim Learning Point-এ আপনাকে স্বাগতম।
+      আপনার পছন্দের ট্রেড বা কোর্সে ভর্তি হতে
+      নিচের বাটনে ক্লিক করে আবেদন ফরম পূরণ করুন।
+    </p>
+
+    <a class="admission-button"
+       href="https://docs.google.com/forms/d/e/1FAIpQLSdcPzLOZIRizgJx2h9NbAMyCKgc7tsYy7yn_Ya7J8x73OGgDg/viewform?usp=header"
+       target="_blank"
+       rel="noopener">
+       📝 ভর্তি আবেদন করুন
+    </a>
+
+    <div class="features">
+
+      <div class="feature">
+        📝<br>
+        অনলাইন আবেদন
+      </div>
+
+      <div class="feature">
+        🎓<br>
+        দক্ষতা উন্নয়ন
+      </div>
+
+      <div class="feature">
+        📚<br>
+        প্রশিক্ষণ সহায়তা
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="contact-area">
+
+    <h3>যোগাযোগ করুন</h3>
+
+    📱 Mobile:
+    <a href="tel:+8801742730213">
+      01742730213
+    </a>
+
+    <br>
+
+    ✉️ Email:
+    <a href="mailto:trainingdrive8@gmail.com">
+      trainingdrive8@gmail.com
+    </a>
+
+    <br>
+
+    <a class="whatsapp-button"
+       href="https://wa.me/qr/VIE7DCR4TALXA1?s=v"
+       target="_blank"
+       rel="noopener">
+       💬 WhatsApp যোগাযোগ
+    </a>
+
+  </div>
+
+  <div class="admission-footer">
+    © Salim Learning Point<br>
+    Learn • Practice • Build Your Skills
+  </div>
+
+</div>
+
+</body>
+</html>
