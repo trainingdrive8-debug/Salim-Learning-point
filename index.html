@@ -4,277 +4,289 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Salim Learning Point | Online Learning</title>
-<meta name="description" content="Salim Learning Point - Books, MCQ, Construction Training and Practical Learning.">
+
+<title>Online Admission - Salim Learning Point</title>
+<meta name="description" content="Salim Learning Point Online Admission. Apply for your preferred training course.">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
- font-family:Arial,"Noto Sans Bengali",sans-serif;
- background:#f4f7fb;color:#172554;line-height:1.7
+* {
+  box-sizing: border-box;
 }
-header{
- background:#102b55;color:white;padding:15px 6%;
- display:flex;justify-content:space-between;
- align-items:center;flex-wrap:wrap;gap:12px;
- position:sticky;top:0;z-index:100;
- box-shadow:0 3px 12px #0002
+
+body {
+  margin: 0;
+  padding: 12px;
+  font-family: Arial, sans-serif;
+  background: #f1f6fc;
 }
-.logo{font-size:23px;font-weight:bold}
-.logo span{color:#38d9f5}
-nav{display:flex;gap:17px;flex-wrap:wrap}
-nav a{color:white;text-decoration:none;font-size:14px}
-nav a:hover{color:#38d9f5}
-.hero{
- background:linear-gradient(120deg,#102b55,#087ca7);
- color:white;text-align:center;padding:85px 20px
+
+.admission-container {
+  width: 100%;
+  max-width: 750px;
+  margin: 15px auto;
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.10);
 }
-.hero h1{font-size:38px;margin-bottom:15px}
-.hero p{font-size:18px;max-width:700px;margin:auto}
-.btn{
- display:inline-block;background:#20c4e5;color:#06294b;
- padding:12px 25px;border-radius:7px;
- text-decoration:none;font-weight:bold;margin:20px 7px 0
+
+.admission-header {
+  padding: 35px 18px;
+  text-align: center;
+  color: white;
+  background: linear-gradient(135deg,#063d82,#078bd0);
 }
-.btn:hover{background:white}
-section{padding:60px 7%;scroll-margin-top:85px}
-.section-title{text-align:center;margin-bottom:30px}
-.section-title h2{font-size:30px;color:#102b55}
-.section-title p{color:#64748b}
-.grid{
- display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
- gap:22px
+
+.logo-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
 }
-.card{
- background:white;padding:25px;border-radius:13px;
- box-shadow:0 4px 15px #102b5510;
- border:1px solid #e5edf5;transition:.25s
+
+.admission-header h1 {
+  margin: 5px 0;
+  font-size: 29px;
 }
-.card:hover{transform:translateY(-5px);box-shadow:0 8px 22px #102b5520}
-.card .emoji{font-size:35px}
-.card h3{margin:10px 0;color:#087ca7}
-.card p{color:#64748b;font-size:14px}
-.card a{
- display:inline-block;margin-top:14px;
- text-decoration:none;color:#087ca7;font-weight:bold
+
+.admission-header h2 {
+  margin: 12px 0;
+  font-size: 21px;
+  letter-spacing: 1px;
 }
-.light{background:#eaf4fb}
-.about{
- max-width:850px;margin:auto;text-align:center;
- background:white;padding:30px;border-radius:15px
+
+.admission-header p {
+  margin: 8px 0 0;
+  line-height: 1.7;
+  font-size: 15px;
+  color: white;
 }
-.about h3{color:#087ca7;margin-bottom:12px}
-footer{
- background:#102b55;color:white;text-align:center;
- padding:30px 15px
+
+.admission-content {
+  padding: 30px 20px;
+  text-align: center;
 }
-footer a{color:#38d9f5;text-decoration:none}
-.menu-btn{
- display:none;background:#20c4e5;border:0;
- padding:8px 12px;border-radius:5px;font-size:20px
+
+.status {
+  display: inline-block;
+  background: #e5f8ed;
+  color: #128348;
+  padding: 8px 18px;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 15px;
 }
-@media(max-width:700px){
- header{padding:12px 5%}
- .menu-btn{display:block}
- nav{display:none;width:100%;flex-direction:column;gap:10px}
- nav.show{display:flex}
- .hero{padding:60px 15px}
- .hero h1{font-size:29px}
- section{padding:45px 5%}
- .section-title h2{font-size:25px}
+
+.admission-content h2 {
+  color: #0756a5;
+  font-size: 23px;
+  margin: 8px 0 12px;
+}
+
+.admission-content p {
+  color: #596779;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.admission-button {
+  display: block;
+  max-width: 350px;
+  margin: 25px auto 10px;
+  padding: 17px 20px;
+  color: white;
+  background: linear-gradient(135deg,#0875cb,#0756a5);
+  text-decoration: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(7,86,165,.25);
+  transition: .25s;
+}
+
+.admission-button:hover {
+  transform: translateY(-3px);
+  background: #06447f;
+}
+
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.feature {
+  flex: 1 1 130px;
+  max-width: 190px;
+  padding: 15px 8px;
+  border: 1px solid #e2eaf3;
+  border-radius: 12px;
+  color: #24496e;
+  font-size: 14px;
+}
+
+.contact-area {
+  padding: 22px 15px;
+  text-align: center;
+  background: #f5f9fd;
+  line-height: 2;
+}
+
+.contact-area h3 {
+  color: #0756a5;
+  margin: 0 0 10px;
+}
+
+.contact-area a {
+  color: #0875cb;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.whatsapp-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #16a34a;
+  color: white !important;
+  border-radius: 25px;
+  margin-top: 8px;
+}
+
+.admission-footer {
+  padding: 18px;
+  text-align: center;
+  color: white;
+  background: #102e50;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+@media(max-width:600px) {
+  body {
+    padding: 3px;
+  }
+
+  .admission-container {
+    margin: 5px auto;
+    border-radius: 13px;
+  }
+
+  .admission-header {
+    padding: 27px 12px;
+  }
+
+  .admission-header h1 {
+    font-size: 23px;
+  }
+
+  .admission-content {
+    padding: 23px 13px;
+  }
+
+  .admission-content h2 {
+    font-size: 20px;
+  }
+
+  .admission-button {
+    font-size: 16px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<header>
- <div class="logo">Salim <span>Learning Point</span></div>
- <button class="menu-btn" onclick="toggleMenu()">☰</button>
- <nav id="navbar">
-  <a href="#home">🏠 Home</a>
-  <a href="#books">📚 Books</a>
-  <a href="#mcq">📝 MCQ</a>
-  <a href="#training">🎓 Training</a>
-  <a href="#practical">🔨 Practical</a>
-  <a href="#about">👤 About Me</a>
-  <a href="#contact">📞 Contact</a>
- </nav>
-</header>
+<div class="admission-container">
 
-<div class="hero" id="home">
- <h1>Welcome to Salim Learning Point</h1>
- <p>শিক্ষা, দক্ষতা ও প্রশিক্ষণের মাধ্যমে নিজেকে গড়ে তুলুন একজন দক্ষ কর্মী হিসেবে।</p>
- <a href="#mcq" class="btn">📝 Start MCQ</a>
- <a href="#training" class="btn">🎓 Explore Training</a>
+  <div class="admission-header">
+    <div class="logo-icon">🎓</div>
+
+    <h1>Salim Learning Point</h1>
+
+    <h2>ONLINE ADMISSION</h2>
+
+    <p>
+      দক্ষতা অর্জন করুন<br>
+      নিজের ভবিষ্যৎ গড়ে তুলুন
+    </p>
+  </div>
+
+  <div class="admission-content">
+
+    <div class="status">
+      ● ভর্তি আবেদন চালু
+    </div>
+
+    <h2>অনলাইন ভর্তি কার্যক্রম</h2>
+
+    <p>
+      Salim Learning Point-এ আপনাকে স্বাগতম।
+      আপনার পছন্দের ট্রেড বা কোর্সে ভর্তি হতে
+      নিচের বাটনে ক্লিক করে আবেদন ফরম পূরণ করুন।
+    </p>
+
+    <a class="admission-button"
+       href="https://docs.google.com/forms/d/e/1FAIpQLSdcPzLOZIRizgJx2h9NbAMyCKgc7tsYy7yn_Ya7J8x73OGgDg/viewform?usp=header"
+       target="_blank"
+       rel="noopener">
+       📝 ভর্তি আবেদন করুন
+    </a>
+
+    <div class="features">
+
+      <div class="feature">
+        📝<br>
+        অনলাইন আবেদন
+      </div>
+
+      <div class="feature">
+        🎓<br>
+        দক্ষতা উন্নয়ন
+      </div>
+
+      <div class="feature">
+        📚<br>
+        প্রশিক্ষণ সহায়তা
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="contact-area">
+
+    <h3>যোগাযোগ করুন</h3>
+
+    📱 Mobile:
+    <a href="tel:+8801742730213">
+      01742730213
+    </a>
+
+    <br>
+
+    ✉️ Email:
+    <a href="mailto:trainingdrive8@gmail.com">
+      trainingdrive8@gmail.com
+    </a>
+
+    <br>
+
+    <a class="whatsapp-button"
+       href="https://wa.me/qr/VIE7DCR4TALXA1?s=v"
+       target="_blank"
+       rel="noopener">
+       💬 WhatsApp যোগাযোগ
+    </a>
+
+  </div>
+
+  <div class="admission-footer">
+    © Salim Learning Point<br>
+    Learn • Practice • Build Your Skills
+  </div>
+
 </div>
-
-<section id="books">
- <div class="section-title">
-  <h2>📚 Learning Books</h2>
-  <p>বিভিন্ন ট্রেডের শিক্ষামূলক বই ও গাইড</p>
- </div>
- <div class="grid">
-  <div class="card">
-   <div class="emoji">📘</div>
-   <h3>Construction Books</h3>
-   <p>নির্মাণ কাজের বিভিন্ন বিষয়ের বই ও গাইড।</p>
-  </div>
-  <div class="card">
-   <div class="emoji">📗</div>
-   <h3>Technical Books</h3>
-   <p>টেকনিক্যাল শিক্ষা ও দক্ষতা উন্নয়নের বই।</p>
-  </div>
-  <div class="card">
-   <div class="emoji">📙</div>
-   <h3>Training Materials</h3>
-   <p>প্রশিক্ষণের জন্য প্রয়োজনীয় শিক্ষা উপকরণ।</p>
-  </div>
- </div>
-</section>
-
-<section id="mcq" class="light">
- <div class="section-title">
-  <h2>📝 MCQ Examination</h2>
-  <p>বিভিন্ন ট্রেডের প্রশ্ন ও উত্তর অনুশীলন করুন</p>
- </div>
- <div class="grid">
-  <div class="card">
-   <div class="emoji">🦺</div>
-   <h3>OSH Procedure</h3>
-   <p>Occupational Safety and Health বিষয়ক প্রশ্ন।</p>
-   <a href="#contact">প্রশ্ন দেখুন →</a>
-  </div>
-  <div class="card">
-   <div class="emoji">🧱</div>
-   <h3>Masonry</h3>
-   <p>Brick Work, Plaster, Foundation ও Masonry।</p>
-   <a href="#contact">প্রশ্ন দেখুন →</a>
-  </div>
-  <div class="card">
-   <div class="emoji">🔩</div>
-   <h3>Rod Binding</h3>
-   <p>Rod Preparation, Stirrups ও Ties।</p>
-   <a href="#contact">প্রশ্ন দেখুন →</a>
-  </div>
-  <div class="card">
-   <div class="emoji">🚰</div>
-   <h3>Plumbing</h3>
-   <p>Pipe Joint, Water Supply ও Plumbing Fixtures।</p>
-   <a href="#contact">প্রশ্ন দেখুন →</a>
-  </div>
-  <div class="card">
-   <div class="emoji">🪨</div>
-   <h3>Tiles & Marble</h3>
-   <p>Floor Tiles, Wall Tiles ও Marble Works।</p>
-   <a href="#contact">প্রশ্ন দেখুন →</a>
-  </div>
-  <div class="card">
-   <div class="emoji">👷</div>
-   <h3>Workplace Skills</h3>
-   <p>Teamwork, Communication ও Construction Sector।</p>
-   <a href="#contact">প্রশ্ন দেখুন →</a>
-  </div>
- </div>
-</section>
-
-<section id="training">
- <div class="section-title">
-  <h2>🎓 Training Programs</h2>
-  <p>দক্ষতা অর্জন করুন প্রশিক্ষণের মাধ্যমে</p>
- </div>
- <div class="grid">
-  <div class="card">
-   <div class="emoji">🏗️</div>
-   <h3>Construction Training</h3>
-   <p>নির্মাণ কাজের বিভিন্ন ট্রেডের প্রশিক্ষণ।</p>
-  </div>
-  <div class="card">
-   <div class="emoji">🔧</div>
-   <h3>Technical Training</h3>
-   <p>হাতে-কলমে কারিগরি দক্ষতা উন্নয়ন।</p>
-  </div>
-  <div class="card">
-   <div class="emoji">💻</div>
-   <h3>Online Learning</h3>
-   <p>অনলাইনে শিক্ষা ও অনুশীলনের সুযোগ।</p>
-  </div>
- </div>
-</section>
-
-<section id="practical" class="light">
- <div class="section-title">
-  <h2>🔨 Practical Learning</h2>
-  <p>বাস্তব কাজের মাধ্যমে দক্ষতা অর্জন</p>
- </div>
- <div class="grid">
-  <div class="card">
-   <div class="emoji">🧱</div>
-   <h3>Masonry Practical</h3>
-   <p>Brick Work, Plaster ও Tiles Fitting।</p>
-  </div>
-  <div class="card">
-   <div class="emoji">🔩</div>
-   <h3>Rod Binding Practical</h3>
-   <p>Rod Cutting, Bending ও Binding।</p>
-  </div>
-  <div class="card">
-   <div class="emoji">🚿</div>
-   <h3>Plumbing Practical</h3>
-   <p>Pipe Installation ও Fixture Fitting।</p>
-  </div>
- </div>
-</section>
-
-<section id="about">
- <div class="section-title">
-  <h2>👤 About Me</h2>
-  <p>আমাদের সম্পর্কে জানুন</p>
- </div>
- <div class="about">
-  <h3>Welcome to Salim Learning Point</h3>
-  <p>
-   Salim Learning Point একটি শিক্ষামূলক অনলাইন প্ল্যাটফর্ম।
-   এখানে শিক্ষার্থীদের জন্য MCQ, Books, Training,
-   Practical Guide এবং Technical Learning Materials
-   প্রদান করার লক্ষ্য নিয়ে কাজ করা হচ্ছে।
-  </p>
-  <p style="margin-top:15px">
-   আমাদের উদ্দেশ্য হলো কারিগরি শিক্ষার প্রসার এবং
-   দক্ষ জনশক্তি তৈরি করতে সহায়তা করা।
-  </p>
- </div>
-</section>
-
-<section id="contact" class="light">
- <div class="section-title">
-  <h2>📞 Contact Us</h2>
-  <p>যেকোনো তথ্যের জন্য যোগাযোগ করুন</p>
- </div>
- <div class="about">
-  <h3>Salim Learning Point</h3>
-  <p>শিক্ষা ও প্রশিক্ষণ সম্পর্কিত তথ্যের জন্য আমাদের সঙ্গে যোগাযোগ করুন।</p>
-  <p style="margin-top:15px">Contact information will be updated soon.</p>
- </div>
-</section>
-
-<footer>
- <h3>Salim Learning Point</h3>
- <p>Learn Today, Lead Tomorrow.</p>
- <p style="margin-top:12px">© 2026 Salim Learning Point. All Rights Reserved.</p>
-</footer>
-
-<script>
-function toggleMenu(){
- document.getElementById("navbar").classList.toggle("show");
-}
-document.querySelectorAll("#navbar a").forEach(function(link){
- link.addEventListener("click",function(){
-  document.getElementById("navbar").classList.remove("show");
- });
-});
-</script>
 
 </body>
 </html>
